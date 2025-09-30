@@ -1,4 +1,3 @@
-
 <!-- src/views/Auth/Signin.vue -->
 
 <script setup>
@@ -54,46 +53,47 @@ const handleSubmit = async () => {
                   Se connecter
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                  Entrez votre numéro de téléphone et votre mot de passe pour vous connecter !
+                  Entrez votre email et votre mot de passe pour vous connecter !
                 </p>
               </div>
               <div>
                 <form @submit.prevent="handleSubmit">
                   <div class="space-y-5">
                     <!-- Affichage des erreurs -->
-                    <div v-if="error" class="text-sm text-error-500">
+                    <div
+                      v-if="error"
+                      class="p-3 text-sm rounded-lg bg-error-50 text-error-700 dark:bg-error-900/20 dark:text-error-400"
+                    >
                       {{ error }}
                     </div>
+                    
                     <!-- Affichage du message de succès -->
-                    <div v-if="successMessage" class="text-sm text-green-500">
+                    <div
+                      v-if="successMessage"
+                      class="p-3 text-sm rounded-lg bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                    >
                       {{ successMessage }}
                     </div>
-                    <!-- Mail-->
+
+                    <!-- Email -->
                     <div>
                       <label
-                        for="phone"
+                        for="username"
                         class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
                       >
-                        Mail<span class="text-error-500">*</span>
+                        Email ou Téléphone<span class="text-error-500">*</span>
                       </label>
                       <input
                         v-model="username"
-                        type="email"
-                        id="phone"
+                        type="text"
+                        id="username"
                         name="username"
-                        placeholder="kenea@gmail.com"
+                        placeholder="kenea@gmail.com ou 1234567891"
                         required
                         class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                       />
                     </div>
-                    <!-- Téléphone -->
-                    <!-- <div>
-                      <label for="phone" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Téléphone<span class="text-error-500">*</span>
-                      </label>
-                      <input v-model="username" type="tel" id="phone" name="username" placeholder="1234567891" required
-                        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                    </div> -->
+
                     <!-- Mot de passe -->
                     <div>
                       <label
@@ -107,7 +107,9 @@ const handleSubmit = async () => {
                           v-model="password"
                           :type="showPassword ? 'text' : 'password'"
                           id="password"
+                          name="password"
                           placeholder="Entrez votre mot de passe"
+                          required
                           class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                         />
                         <span
@@ -149,7 +151,8 @@ const handleSubmit = async () => {
                         </span>
                       </div>
                     </div>
-                    <!-- Checkbox -->
+
+                    <!-- Checkbox et lien -->
                     <div class="flex items-center justify-between">
                       <div>
                         <label
@@ -199,11 +202,12 @@ const handleSubmit = async () => {
                         >Mot de passe oublié ?</router-link
                       >
                     </div>
+
                     <!-- Bouton -->
                     <div>
                       <button
                         type="submit"
-                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-900"
+                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         :disabled="isLoading"
                       >
                         <span v-if="isLoading">Connexion en cours...</span>
@@ -249,4 +253,3 @@ const handleSubmit = async () => {
     </div>
   </FullScreenLayout>
 </template>
-
