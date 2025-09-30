@@ -126,6 +126,8 @@
 </template>
 
 <script setup>
+console.error("icic");
+
 import { ref } from 'vue'
 
 const products = ref([
