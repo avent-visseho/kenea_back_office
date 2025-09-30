@@ -33,6 +33,13 @@ const router = createRouter({
       meta: {
         title: 'Pharmacie',
       },
+    },{
+      path: '/pays',
+      name: 'Pays',
+      component: () => import('../views/pays/PaysView.vue'),
+      meta: {
+        title: 'Pharmacie',
+      },
     },
     {
       path: '/calendar',
