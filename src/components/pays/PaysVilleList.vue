@@ -4,7 +4,7 @@
   >
     <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Recent Orders</h3>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Pays et villes</h3>
       </div>
 
       <div class="flex items-center gap-3">
@@ -63,45 +63,48 @@
         <thead>
           <tr class="border-t border-gray-100 dark:border-gray-800">
             <th class="py-3 text-left">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Products</p>
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Nom</p>
             </th>
             <th class="py-3 text-left">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Category</p>
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Code</p>
             </th>
             <th class="py-3 text-left">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Price</p>
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Indicatif</p>
             </th>
             <th class="py-3 text-left">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">User ID</p>
+            </th>
+            <th class="py-3 text-left">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Action</p>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(product, index) in products"
+            v-for="(name, index) in names"
             :key="index"
             class="border-t border-gray-100 dark:border-gray-800"
           >
             <td class="py-3 whitespace-nowrap">
               <div class="flex items-center gap-3">
                 <div class="h-[50px] w-[50px] overflow-hidden rounded-md">
-                  <img :src="product.image" :alt="product.name" />
+                  <FlagIcon/>
                 </div>
                 <div>
                   <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {{ product.name }}
+                    {{ name.name }}
                   </p>
                   <span class="text-gray-500 text-theme-xs dark:text-gray-400"
-                    >{{ product.variants }} Variants</span
+                    >{{ name.code }} Variants</span
                   >
                 </div>
               </div>
             </td>
             <td class="py-3 whitespace-nowrap">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ product.category }}</p>
+              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ name.indicatif }}</p>
             </td>
             <td class="py-3 whitespace-nowrap">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ product.price }}</p>
+              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ name.userId }}</p>
             </td>
             <td class="py-3 whitespace-nowrap">
               <span
@@ -118,6 +121,7 @@
                 {{ product.status }}
               </span>
             </td>
+            <td class="py-3 whitespace-nowrap">edit</td>
           </tr>
         </tbody>
       </table>
@@ -126,50 +130,34 @@
 </template>
 
 <script setup>
-console.error("icic");
 
+import FlagIcon from '@/icons/FlagIcon.vue';
 import { ref } from 'vue'
 
 const products = ref([
   {
-    name: 'Macbook pro 13"',
-    variants: 2,
-    image: '/images/product/product-01.jpg',
-    category: 'Laptop',
-    price: '$2399.00',
-    status: 'Delivered',
+    name: 'Bénin',
+    code: 'BJ',
+    indicatif: '+229',
+    userId: 'seee23',
   },
   {
-    name: 'Apple Watch Ultra',
-    variants: 1,
-    image: '/images/product/product-02.jpg',
-    category: 'Watch',
-    price: '$879.00',
-    status: 'Pending',
+    name: 'Togo',
+    code: 'TG',
+    indicatif: '+228',
+    userId: 'seee23',
   },
   {
-    name: 'iPhone 15 Pro Max',
-    variants: 2,
-    image: '/images/product/product-03.jpg',
-    category: 'SmartPhone',
-    price: '$1869.00',
-    status: 'Delivered',
+    name: 'Mali',
+    code: 'BJ',
+    indicatif: '+223',
+    userId: 'seee23',
   },
   {
-    name: 'iPad Pro 3rd Gen',
-    variants: 2,
-    image: '/images/product/product-04.jpg',
-    category: 'Electronics',
-    price: '$1699.00',
-    status: 'Canceled',
-  },
-  {
-    name: 'Airpods Pro 2nd Gen',
-    variants: 1,
-    image: '/images/product/product-05.jpg',
-    category: 'Accessories',
-    price: '$240.00',
-    status: 'Delivered',
+    name: 'Sénégal',
+    code: 'BJ',
+    indicatif: '+221',
+    userId: 'seee23',
   },
 ])
 </script>

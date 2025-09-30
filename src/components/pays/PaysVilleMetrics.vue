@@ -1,6 +1,4 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
@@ -30,7 +28,7 @@
       <div class="flex items-end justify-between mt-5">
         <div>
           <span class="text-sm text-gray-500 dark:text-gray-400">Pays</span>
-          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">3,782</h4>
+          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">4</h4>
         </div>
 
         <span
@@ -52,7 +50,7 @@
             />
           </svg>
 
-          11.01%
+          12
         </span>
       </div>
     </div>
@@ -82,8 +80,8 @@
 
       <div class="flex items-end justify-between mt-5">
         <div>
-          <span class="text-sm text-gray-500 dark:text-gray-400">Régions</span>
-          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">3,782</h4>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Villes</span>
+          <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">23</h4>
         </div>
 
         <span
@@ -135,7 +133,7 @@
 
       <div class="flex items-end justify-between mt-5">
         <div>
-          <span class="text-sm text-gray-500 dark:text-gray-400">Villes</span>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Clients</span>
           <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">5,359</h4>
         </div>
 
