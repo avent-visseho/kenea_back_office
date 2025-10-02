@@ -18,7 +18,7 @@ const getPaysById = (id) => {
 
 const updatePays = (id, data) => {
   // ✅ CORRECTION: v3/pays/update/${id} était mal formaté
-  return callerService.Axios.put(`${callerService.API_URL}v3/pays/update/${id}`, data)
+   return callerService.Axios.put(`${callerService.API_URL}v3/pays/update/${id}?id=${id}`, data)
 }
 
 const deletePays = (id) => {
@@ -42,13 +42,11 @@ const getCitiesById = (id) => {
 }
 
 const updateCities = (id, data) => {
-  // ✅ CORRECTION: v3/cities/${id} était mal formaté
   return callerService.Axios.put(`${callerService.API_URL}v3/cities/${id}`, data)
 }
 
 const deleteCities = (id) => {
-  // ✅ CORRECTION: v3/cities/delete/${id} était mal formaté
-  return callerService.Axios.delete(`${callerService.API_URL}v3/cities/delete/${id}`)
+  return callerService.Axios.delete(`${callerService.API_URL}v3/cities/${id}`)
 }
 
 export const PaysVilleService = {

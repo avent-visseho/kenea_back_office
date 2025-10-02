@@ -6,7 +6,7 @@ import CommonGridShape from '@/components/common/CommonGridShape.vue'
 import FullScreenLayout from '@/components/layout/FullScreenLayout.vue'
 import { useAuth } from '@/composables/useAuth.js'
 
-const { signIn, resendCode, isLoading, error, successMessage } = useAuth()
+const { verifyOtp, resendCode, isLoading, error, successMessage } = useAuth()
 
 // Code de vérification à 6 chiffres
 const otp = ref(['', '', '', '', '', ''])
@@ -26,7 +26,7 @@ const setInputRef = (el, index) => {
 
 // Gestion de la saisie
 const handleInput = (index, event) => {
-  const value = event.target.value.replace(/[^0-9]/g, '') // Seuls les chiffres
+  const value = event.target.value.replace(/[^0-9]/g, '')
   if (value.length <= 1) {
     otp.value[index] = value
     if (value && index < 5) {
@@ -60,36 +60,32 @@ const handlePaste = (event) => {
     for (let i = 0; i < 6; i++) {
       otp.value[i] = paste[i] || ''
     }
-    // Focus le dernier input après collage
     nextTick(() => {
       inputRefs.value[5]?.focus()
     })
   }
 }
 
-// ✅ AMÉLIORATION: Soumettre le formulaire avec gestion d'erreur
+// ✅ Soumettre le code OTP
 const handleSubmit = async () => {
   if (!isCodeComplete.value) {
     return
   }
 
   try {
-    await signIn({
-      otp: otp.value.join(''),
-      keepLoggedIn: localStorage.getItem('keepLoggedIn') === 'true',
-    })
+    const otpCode = otp.value.join('')
+    await verifyOtp(otpCode)
   } catch (err) {
-    // L'erreur est déjà gérée dans useAuth
-    console.error('Erreur de vérification OTP:', err)
+    console.error('OTP verification error:', err)
   }
 }
 
-// ✅ AMÉLIORATION: Renvoyer le code avec feedback
+// ✅ Renvoyer le code
 const handleResendCode = async () => {
   try {
     await resendCode()
   } catch (err) {
-    console.error('Erreur de renvoi du code:', err)
+    console.error('Resend code error:', err)
   }
 }
 </script>
@@ -97,16 +93,12 @@ const handleResendCode = async () => {
 <template>
   <FullScreenLayout>
     <div class="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
-      <div
-        class="relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900"
-      >
+      <div class="relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900">
         <div class="flex flex-col flex-1 w-full lg:w-1/2">
           <div class="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
             <div>
               <div class="mb-5 sm:mb-8">
-                <h1
-                  class="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md"
-                >
+                <h1 class="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
                   Vérification en deux étapes
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -136,9 +128,7 @@ const handleResendCode = async () => {
 
                     <!-- Code de vérification à 6 chiffres -->
                     <div>
-                      <label
-                        class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                      >
+                      <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Saisissez votre code de sécurité à 6 chiffres.
                       </label>
 
@@ -174,9 +164,7 @@ const handleResendCode = async () => {
                 </form>
 
                 <div class="mt-5">
-                  <p
-                    class="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start"
-                  >
+                  <p class="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                     Vous n'avez pas reçu le code ?
                     <button
                       @click="handleResendCode"

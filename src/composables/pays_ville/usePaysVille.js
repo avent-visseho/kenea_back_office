@@ -2,23 +2,27 @@
 import { ref } from 'vue'
 import { PaysVilleService } from '../../api/services/pays_ville'
 
+// État partagé entre toutes les instances du composable
+const paysList = ref([])
+const citiesList = ref([])
+const isLoading = ref(false)
+const error = ref(null)
+
 export function usePaysVille() {
-  const isLoading = ref(false)
-  const error = ref(null)
-
   // ============= PAYS =============
-  const paysList = ref([])
-
   const fetchPaysList = async () => {
     isLoading.value = true
     error.value = null
 
     try {
       const response = await PaysVilleService.getPaysList()
-      if (response.data.success) {
-        paysList.value = response.data.data || response.data.pays || []
+      console.log(response, 'pays')
+
+      if (response.data.status === 'SUCCESS') {
+        paysList.value = response.data.body || []
         return { success: true, data: paysList.value }
       }
+
       return { success: false, error: 'Erreur lors du chargement des pays' }
     } catch (err) {
       error.value = err.response?.data?.message || 'Erreur lors du chargement des pays'
@@ -35,9 +39,15 @@ export function usePaysVille() {
 
     try {
       const response = await PaysVilleService.addPays(paysData)
-      if (response.data.success) {
-        await fetchPaysList()
-        return { success: true, data: response.data.data }
+      if (response.data.status === 'SUCCESS') {
+        // Ajouter directement le nouveau pays à la liste
+        if (response.data.body) {
+          paysList.value.push(response.data.body)
+        } else {
+          // Fallback: recharger si le body n'est pas disponible
+          await fetchPaysList()
+        }
+        return { success: true, data: response.data.body }
       }
       return { success: false, error: 'Erreur lors de la création du pays' }
     } catch (err) {
@@ -49,15 +59,22 @@ export function usePaysVille() {
     }
   }
 
-  const updatePays = async (code, paysData) => {
+  const updatePays = async (id, paysData) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await PaysVilleService.updatePays(code, paysData)
-      if (response.data.success) {
-        await fetchPaysList()
-        return { success: true, data: response.data.data }
+      const response = await PaysVilleService.updatePays(id, paysData)
+      if (response.data.status === 'SUCCESS') {
+        // Mettre à jour directement dans la liste
+        const index = paysList.value.findIndex(p => p.id === id || p.code === id)
+        if (index !== -1 && response.data.body) {
+          paysList.value[index] = response.data.body
+        } else {
+          // Fallback: recharger si pas trouvé
+          await fetchPaysList()
+        }
+        return { success: true, data: response.data.body }
       }
       return { success: false, error: 'Erreur lors de la modification du pays' }
     } catch (err) {
@@ -69,14 +86,15 @@ export function usePaysVille() {
     }
   }
 
-  const deletePays = async (code) => {
+  const deletePays = async (id) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await PaysVilleService.deletePays(code)
-      if (response.data.success) {
-        await fetchPaysList()
+      const response = await PaysVilleService.deletePays(id)
+      if (response.data.status === 'SUCCESS') {
+        // Supprimer directement de la liste
+        paysList.value = paysList.value.filter(p => p.id !== id && p.code !== id)
         return { success: true }
       }
       return { success: false, error: 'Erreur lors de la suppression du pays' }
@@ -89,25 +107,20 @@ export function usePaysVille() {
     }
   }
 
-  // ============= CITIES =============
-  const citiesList = ref([])
-
+  // ============= VILLES =============
   const fetchCitiesList = async () => {
     isLoading.value = true
     error.value = null
 
     try {
-      // ✅ CORRECTION: CitiesVilleService n'existe pas, utilisation de PaysVilleService
       const response = await PaysVilleService.getCitiesList()
-      if (response.data.success) {
-        citiesList.value = response.data.data || response.data.cities || []
+      if (response.data.status === 'SUCCESS') {
+        citiesList.value = response.data.body || []
         return { success: true, data: citiesList.value }
       }
-      // ✅ CORRECTION: Message d'erreur cohérent (villes au lieu de cities)
       return { success: false, error: 'Erreur lors du chargement des villes' }
     } catch (err) {
       error.value = err.response?.data?.message || 'Erreur lors du chargement des villes'
-      // ✅ CORRECTION: Nom de la fonction dans le log
       console.error('Erreur fetchCitiesList:', err)
       return { success: false, error: error.value }
     } finally {
@@ -115,19 +128,21 @@ export function usePaysVille() {
     }
   }
 
-  // ✅ CORRECTION: Paramètre paysData renommé en citiesData
   const createCities = async (citiesData) => {
     isLoading.value = true
     error.value = null
 
     try {
-      // ✅ CORRECTION: Utilisation de citiesData au lieu de paysData
       const response = await PaysVilleService.addCities(citiesData)
-      if (response.data.success) {
-        await fetchCitiesList()
-        return { success: true, data: response.data.data }
+      if (response.data.status === 'SUCCESS') {
+        // Ajouter directement la nouvelle ville à la liste
+        if (response.data.body) {
+          citiesList.value.push(response.data.body)
+        } else {
+          await fetchCitiesList()
+        }
+        return { success: true, data: response.data.body }
       }
-      // ✅ CORRECTION: Message d'erreur cohérent (ville au lieu de cities)
       return { success: false, error: 'Erreur lors de la création de la ville' }
     } catch (err) {
       error.value = err.response?.data?.message || 'Erreur lors de la création de la ville'
@@ -138,18 +153,22 @@ export function usePaysVille() {
     }
   }
 
-  const updateCities = async (code, citiesData) => {
+  const updateCities = async (id, citiesData) => {
     isLoading.value = true
     error.value = null
 
     try {
-      // ✅ CORRECTION: CitiesVilleService n'existe pas, utilisation de PaysVilleService
-      const response = await PaysVilleService.updateCities(code, citiesData)
-      if (response.data.success) {
-        await fetchCitiesList()
-        return { success: true, data: response.data.data }
+      const response = await PaysVilleService.updateCities(id, citiesData)
+      if (response.data.status === 'SUCCESS') {
+        // Mettre à jour directement dans la liste
+        const index = citiesList.value.findIndex(c => c.id === id || c.code === id)
+        if (index !== -1 && response.data.body) {
+          citiesList.value[index] = response.data.body
+        } else {
+          await fetchCitiesList()
+        }
+        return { success: true, data: response.data.body }
       }
-      // ✅ CORRECTION: Message d'erreur cohérent (ville au lieu de cities)
       return { success: false, error: 'Erreur lors de la modification de la ville' }
     } catch (err) {
       error.value = err.response?.data?.message || 'Erreur lors de la modification de la ville'
@@ -160,18 +179,17 @@ export function usePaysVille() {
     }
   }
 
-  const deleteCities = async (code) => {
+  const deleteCities = async (id) => {
     isLoading.value = true
     error.value = null
 
     try {
-      // ✅ CORRECTION: CitiesVilleService n'existe pas, utilisation de PaysVilleService
-      const response = await PaysVilleService.deleteCities(code)
-      if (response.data.success) {
-        await fetchCitiesList()
+      const response = await PaysVilleService.deleteCities(id)
+      if (response.data.status === 'SUCCESS') {
+        // Supprimer directement de la liste
+        citiesList.value = citiesList.value.filter(c => c.id !== id && c.code !== id)
         return { success: true }
       }
-      // ✅ CORRECTION: Message d'erreur cohérent (ville au lieu de Cities)
       return { success: false, error: 'Erreur lors de la suppression de la ville' }
     } catch (err) {
       error.value = err.response?.data?.message || 'Erreur lors de la suppression de la ville'
@@ -183,7 +201,7 @@ export function usePaysVille() {
   }
 
   return {
-    // État
+    // État partagé
     isLoading,
     error,
     paysList,
@@ -195,7 +213,7 @@ export function usePaysVille() {
     updatePays,
     deletePays,
 
-    // Méthodes Cities
+    // Méthodes Villes
     fetchCitiesList,
     createCities,
     updateCities,

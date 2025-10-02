@@ -8,7 +8,7 @@ const API_URL = API_HOST_SERVEUR + 'kenea/api/'
 
 const Axios = axios.create({
   baseURL: API_HOST_SERVEUR,
-  timeout: import.meta.env.VITE_API_TIMEOUT || 10000,
+  timeout: import.meta.env.VITE_API_TIMEOUT || 120000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,17 +17,29 @@ const Axios = axios.create({
 // Intercepteur de requête - ajouter le token automatiquement
 Axios.interceptors.request.use(
   (request) => {
+    /* console.log('📤 Request:', {
+      url: request.url,
+      method: request.method,
+      hasToken: !!request.headers.Authorization,
+    }) */ // ⬅️ Ajoute ce log
+
     const authData = localStorage.getItem('auth_data')
+
     if (authData) {
       try {
         const parsed = JSON.parse(authData)
-        if (parsed.tokens?.access_token && parsed.tokens?.token_type) {
-          // ✅ CORRECTION: Utilisation correcte des backticks
-          request.headers.Authorization = `${parsed.tokens.token_type} ${parsed.tokens.access_token}`
+
+        // ⬅️ Essaie différentes structures possibles
+        const token = parsed.tokens?.access_token || parsed.access_token || parsed.token
+        const tokenType = parsed.tokens?.token_type || parsed.token_type || 'Bearer'
+
+        if (token) {
+          request.headers.Authorization = `${tokenType} ${token}`
+        } else {
         }
       } catch (error) {
-        console.error('Erreur lors de la lecture du token:', error)
       }
+    } else {
     }
 
     return request

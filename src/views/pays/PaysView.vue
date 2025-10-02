@@ -1,3 +1,4 @@
+//src/views/pays/PaysView.vue
 <template>
   <admin-layout>
      <PageBreadcrumb :pageTitle="currentPageTitle" />

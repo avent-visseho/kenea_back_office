@@ -12,11 +12,18 @@ import App from './App.vue'
 import router from './router'
 import VueApexCharts from 'vue3-apexcharts'
 
-const pinia = createPinia()
-const app = createApp(App)
+import { useAuthStore } from '@/store/auth/auth'
 
+const app = createApp(App)
+const pinia = createPinia()
+
+// ⚠️ Toujours installer Pinia avant d'utiliser un store
+app.use(pinia)
 app.use(router)
 app.use(VueApexCharts)
-app.use(pinia)
+
+// ✅ Maintenant on peut appeler le store
+const authStore = useAuthStore()
+authStore.initialize()
 
 app.mount('#app')

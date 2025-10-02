@@ -1,287 +1,249 @@
 // src/store/auth/auth.js
 import { defineStore } from 'pinia'
-import { apiService } from '@/api/services/api'
+import {
+  login,
+  verifyOtp,
+  resendOtp,
+  getUserInfo,
+  logout as logoutApi,
+} from '@/api/services/authService'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    tokens: {
-      access_token: null,
-      refresh_token: null,
-      token_type: 'Bearer',
-      expires_in: null,
-      expires_at: null,
-    },
+    token: null,
+    pendingUsername: null, // Stocke le username en attendant l'OTP
     isAuthenticated: false,
     isLoading: false,
     error: null,
+    successMessage: null,
   }),
 
   getters: {
-    // ✅ CORRECTION: Utilisation correcte des backticks
     bearerToken: (state) => {
-      if (state.tokens.access_token && state.tokens.token_type) {
-        return `${state.tokens.token_type} ${state.tokens.access_token}`
-      }
-      return null
-    },
-
-    isTokenExpired: (state) => {
-      if (!state.tokens.expires_at) return true
-      return Date.now() >= state.tokens.expires_at
-    },
-
-    userRoles: (state) => {
-      if (!state.user?.resource_access) return []
-
-      const roles = []
-      // Récupérer tous les rôles de toutes les ressources
-      Object.keys(state.user.resource_access).forEach((resource) => {
-        if (state.user.resource_access[resource]?.roles) {
-          roles.push(...state.user.resource_access[resource].roles)
-        }
-      })
-
-      // Ajouter les rôles du realm
-      if (state.user.realm_access?.roles) {
-        roles.push(...state.user.realm_access.roles)
-      }
-
-      return [...new Set(roles)] // Supprimer les doublons
-    },
-
-    hasRole: (state) => {
-      return (role) => {
-        // ✅ CORRECTION: Accès au getter userRoles
-        const roles = state.userRoles
-        return roles.includes(role)
-      }
+      return state.token ? `Bearer ${state.token}` : null
     },
   },
 
   actions: {
-    // ✅ AMÉLIORATION: Connexion adaptée à votre flux (email/phone + password)
+    // ✅ Étape 1: Connexion initiale
     async login(credentials) {
       this.isLoading = true
       this.error = null
+      this.successMessage = null
 
       try {
-        // Premier appel: envoyer email/phone + password
-        const response = await apiService.postResource(
-          credentials,
-          '/kenea/api/authenticate'
-        )
+        const response = await login(credentials)
 
-        if (response.data.success) {
-          // Si la réponse contient directement les tokens (pas d'OTP)
-          if (response.data.access_token) {
-            this.tokens = {
-              access_token: response.data.access_token,
-              refresh_token: response.data.refresh_token,
-              token_type: response.data.token_type || 'Bearer',
-              expires_in: response.data.expires_in,
-              expires_at: Date.now() + response.data.expires_in * 1000,
-            }
+        console.log('Login response:', response)
 
-            this.isAuthenticated = true
-            this.saveToStorage()
-            await this.fetchUserInfo()
-            
-            return { success: true, requiresOtp: false }
+        // Vérifier le statut de la réponse
+        if (response.status === 'SUCCESS') {
+          // Stocker le username pour l'étape OTP
+          this.pendingUsername = credentials.username
+
+          return {
+            success: true,
+            requiresOtp: true,
+            message: response.message || 'Code envoyé avec succès',
           }
-          
-          // Si un OTP est requis
-          return { success: true, requiresOtp: true, message: response.data.message }
         }
 
-        return { success: false, error: 'Erreur de connexion' }
+        return {
+          success: false,
+          error: response.message || 'Erreur de connexion',
+        }
       } catch (error) {
-        this.error = error.response?.data?.message || 'Erreur de connexion'
-        console.error('Erreur de connexion:', error)
-        return { success: false, error: this.error }
+        const errorMsg = error.response?.data?.message || 'Erreur de connexion au serveur'
+        this.error = errorMsg
+        console.error('Login error:', error)
+        return { success: false, error: errorMsg }
       } finally {
         this.isLoading = false
       }
     },
 
-    // ✅ NOUVEAU: Vérification OTP
-    async verifyOtp(username, otp) {
+    // ✅ Étape 2: Vérification OTP
+    async verifyOtp(otp) {
+      if (!this.pendingUsername) {
+        this.error = 'Session expirée. Veuillez vous reconnecter.'
+        return { success: false, error: this.error }
+      }
+
       this.isLoading = true
       this.error = null
+      this.successMessage = null
 
       try {
-        const response = await apiService.postResource(
-          { username, otp },
-          '/kenea/api/verify'
-        )
+        const response = await verifyOtp({
+          username: this.pendingUsername,
+          otp: otp,
+        })
 
-        if (response.data.success) {
-          this.tokens = {
-            access_token: response.data.access_token,
-            refresh_token: response.data.refresh_token,
-            token_type: response.data.token_type || 'Bearer',
-            expires_in: response.data.expires_in,
-            expires_at: Date.now() + response.data.expires_in * 1000,
-          }
+        console.log('OTP verification response:', response)
 
+        if (response.status === 'SUCCESS' && response.body?.token) {
+          // Sauvegarder le token
+          this.token = response.body.token
           this.isAuthenticated = true
+          this.pendingUsername = null
+
+          // Sauvegarder dans localStorage ou sessionStorage
           this.saveToStorage()
+
+          // Récupérer les infos utilisateur
           await this.fetchUserInfo()
 
           return { success: true }
         }
 
-        return { success: false, error: 'Code OTP invalide' }
+        return {
+          success: false,
+          error: response.message || 'Code OTP invalide',
+        }
       } catch (error) {
-        this.error = error.response?.data?.message || 'Erreur de vérification OTP'
-        console.error('Erreur de vérification OTP:', error)
-        return { success: false, error: this.error }
+        const errorMsg = error.response?.data?.message || 'Erreur de vérification OTP'
+        this.error = errorMsg
+        console.error('OTP verification error:', error)
+        return { success: false, error: errorMsg }
       } finally {
         this.isLoading = false
       }
     },
 
-    // ✅ NOUVEAU: Renvoyer OTP
-    async resendOtp(username) {
+    // ✅ Renvoyer OTP
+    async resendOtp() {
+      if (!this.pendingUsername) {
+        this.error = 'Session expirée. Veuillez vous reconnecter.'
+        return { success: false, error: this.error }
+      }
+
       this.isLoading = true
       this.error = null
+      this.successMessage = null
 
       try {
-        const response = await apiService.postResource(
-          { username },
-          '/kenea/api/resend-otp'
-        )
+        const response = await resendOtp(this.pendingUsername)
 
-        if (response.data.success) {
-          return { success: true, message: 'Code renvoyé avec succès' }
+        if (response.status === 'SUCCESS') {
+          this.successMessage = 'Code renvoyé avec succès'
+          return { success: true, message: this.successMessage }
         }
 
-        return { success: false, error: 'Erreur lors du renvoi du code' }
+        return {
+          success: false,
+          error: response.message || 'Erreur lors du renvoi du code',
+        }
       } catch (error) {
-        this.error = error.response?.data?.message || 'Erreur lors du renvoi du code'
-        console.error('Erreur de renvoi OTP:', error)
-        return { success: false, error: this.error }
+        const errorMsg = error.response?.data?.message || 'Erreur lors du renvoi du code'
+        this.error = errorMsg
+        console.error('Resend OTP error:', error)
+        return { success: false, error: errorMsg }
       } finally {
         this.isLoading = false
       }
     },
 
-    // Récupérer les infos utilisateur
+    // ✅ Récupérer les infos utilisateur
     async fetchUserInfo() {
-      if (!this.tokens.access_token) return
+      if (!this.token) return
 
       try {
-        const response = await apiService.getResource('/kenea/api/v1/auth/me')
+        const response = await getUserInfo()
 
-        if (response.data.success) {
-          this.user = response.data.user || response.data.data
-          console.log('User info fetched:', this.user)
+        console.log('User info response:', response)
+
+        // ✅ CORRECTION: La réponse est directement {roles, expiration, username}
+        // Pas besoin de response.body ou response.data
+        if (response && response.username) {
+          this.user = response // ✅ Directement la réponse
+          console.log('User info saved to store:', this.user)
           this.saveToStorage()
+        } else {
+          console.error('Invalid user info response:', response)
         }
       } catch (error) {
-        console.error('Erreur lors de la récupération des infos utilisateur:', error)
+        console.error('Error fetching user info:', error)
         if (error.response?.status === 401) {
           this.logout()
         }
       }
     },
 
-    // Déconnexion
+    // ✅ Déconnexion
     async logout() {
       try {
-        // Appeler l'endpoint de logout si disponible
-        await apiService.postResource({}, '/kenea/api/logout')
-      } catch (error) {
-        console.error('Erreur lors de la déconnexion:', error)
-      } finally {
-        // Nettoyer le state même en cas d'erreur
-        this.user = null
-        this.tokens = {
-          access_token: null,
-          refresh_token: null,
-          token_type: 'Bearer',
-          expires_in: null,
-          expires_at: null,
+        if (this.token) {
+          await logoutApi()
         }
+      } catch (error) {
+        console.error('Logout error:', error)
+      } finally {
+        this.user = null
+        this.token = null
+        this.pendingUsername = null
         this.isAuthenticated = false
         this.error = null
+        this.successMessage = null
         localStorage.removeItem('auth_data')
+        localStorage.removeItem('auth_token')
+        sessionStorage.removeItem('auth_data')
+        sessionStorage.removeItem('auth_token')
       }
     },
 
-    // Rafraîchir le token
-    async refreshToken() {
-      if (!this.tokens.refresh_token) {
-        this.logout()
-        return false
-      }
-
-      try {
-        const response = await apiService.postResource(
-          {
-            refresh_token: this.tokens.refresh_token,
-          },
-          '/kenea/api/v1/auth/refresh',
-        )
-
-        if (response.data.success) {
-          this.tokens = {
-            ...this.tokens,
-            access_token: response.data.access_token,
-            expires_in: response.data.expires_in,
-            expires_at: Date.now() + response.data.expires_in * 1000,
-          }
-
-          this.saveToStorage()
-          return true
-        }
-
-        return false
-      } catch (error) {
-        console.error('Erreur lors du rafraîchissement du token:', error)
-        this.logout()
-        return false
-      }
-    },
-
-    // Sauvegarder dans localStorage
-    saveToStorage() {
+    // ✅ Sauvegarder dans le storage
+    saveToStorage(useLocalStorage = true) {
       const authData = {
         user: this.user,
-        tokens: this.tokens,
+        token: this.token,
         isAuthenticated: this.isAuthenticated,
       }
-      localStorage.setItem('auth_data', JSON.stringify(authData))
+
+      const storage = useLocalStorage ? localStorage : sessionStorage
+      storage.setItem('auth_data', JSON.stringify(authData))
+
+      // Aussi sauvegarder le token séparément pour axios
+      storage.setItem('auth_token', this.token)
+
+      console.log('Auth data saved to storage:', authData)
     },
 
-    // Charger depuis localStorage
+    // ✅ Charger depuis le storage
     loadFromStorage() {
       try {
-        const authData = localStorage.getItem('auth_data')
+        const authData = localStorage.getItem('auth_data') || sessionStorage.getItem('auth_data')
+
         if (authData) {
           const parsed = JSON.parse(authData)
           console.log('Loaded from storage:', parsed)
 
-          if (parsed.tokens?.expires_at && Date.now() < parsed.tokens.expires_at) {
+          if (parsed.token) {
             this.user = parsed.user
-            this.tokens = parsed.tokens
+            this.token = parsed.token
             this.isAuthenticated = parsed.isAuthenticated
-            console.log('User after load:', this.user)
+            console.log('User restored from storage:', this.user)
             return true
-          } else {
-            localStorage.removeItem('auth_data')
           }
         }
       } catch (error) {
-        console.error("Erreur lors du chargement des données d'authentification:", error)
+        console.error('Error loading auth data:', error)
         localStorage.removeItem('auth_data')
+        localStorage.removeItem('auth_token')
+        sessionStorage.removeItem('auth_data')
+        sessionStorage.removeItem('auth_token')
       }
       return false
     },
 
-    // Initialiser le store (à appeler au démarrage de l'app)
+    // ✅ Initialiser le store
     initialize() {
-      return this.loadFromStorage()
+      const loaded = this.loadFromStorage()
+      if (loaded && this.token) {
+        // Si on a un token, essayer de recharger les infos utilisateur
+        this.fetchUserInfo()
+      }
+      return loaded
     },
   },
 })

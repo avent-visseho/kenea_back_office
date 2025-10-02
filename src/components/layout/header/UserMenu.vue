@@ -1,3 +1,4 @@
+<!-- src/components/layout/header/UserMenu.vue -->
 <template>
   <div class="relative" ref="dropdownRef">
     <button
@@ -8,7 +9,9 @@
         <img src="/images/user/owner.jpg" alt="User" />
       </span>
 
-      <span class="block mr-1 font-medium text-theme-sm">Musharof </span>
+      <span class="block mr-1 font-medium text-theme-sm">
+        {{ displayName }}
+      </span>
 
       <ChevronDownIcon :class="{ 'rotate-180': dropdownOpen }" />
     </button>
@@ -20,10 +23,16 @@
     >
       <div>
         <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-          Musharof Chowdhury
+          {{ displayName }}
         </span>
         <span class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-          randomuser@pimjo.com
+          {{ user?.username || 'Chargement...' }}
+        </span>
+        <span
+          v-if="user?.roles && user.roles.length > 0"
+          class="inline-block px-2 py-0.5 mt-2 text-xs font-medium rounded-full bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-400"
+        >
+          {{ user.roles[0] }}
         </span>
       </div>
 
@@ -33,7 +42,6 @@
             :to="item.href"
             class="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
           >
-            <!-- SVG icon would go here -->
             <component
               :is="item.icon"
               class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300"
@@ -42,16 +50,16 @@
           </router-link>
         </li>
       </ul>
-      <router-link
-        to="/signin"
-        @click="signOut"
+      
+      <button
+        @click="handleSignOut"
         class="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
       >
         <LogoutIcon
           class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300"
         />
         Sign out
-      </router-link>
+      </button>
     </div>
     <!-- Dropdown End -->
   </div>
@@ -60,15 +68,46 @@
 <script setup>
 import { UserCircleIcon, ChevronDownIcon, LogoutIcon, SettingsIcon, InfoCircleIcon } from '@/icons'
 import { RouterLink } from 'vue-router'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useAuth } from '@/composables/useAuth.js'
+
+const { user, signOut, userRoles } = useAuth()
 
 const dropdownOpen = ref(false)
 const dropdownRef = ref(null)
 
+// Computed pour extraire le nom d'affichage depuis l'email
+const displayName = computed(() => {
+  if (!user.value?.username) return 'Utilisateur'
+  
+  const username = user.value.username
+  
+  // Si c'est un email, extraire la partie avant @
+  if (username.includes('@')) {
+    const name = username.split('@')[0]
+    // Capitaliser la première lettre
+    return name.charAt(0).toUpperCase() + name.slice(1)
+  }
+  
+  // Si c'est un username simple, capitaliser
+  return username.charAt(0).toUpperCase() + username.slice(1)
+})
+
+// Classe CSS pour les badges de rôles
+const getRoleBadgeClass = (role) => {
+  const classes = {
+    'SUPER_ADMIN': 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400',
+    'ADMIN': 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400',
+    'PHARMACIEN': 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
+    'USER': 'bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-400',
+  }
+  return classes[role] || 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
+}
+
 const menuItems = [
   { href: '/profile', icon: UserCircleIcon, text: 'Edit profile' },
-  { href: '/chat', icon: SettingsIcon, text: 'Account settings' },
-  { href: '/profile', icon: InfoCircleIcon, text: 'Support' },
+  { href: '/settings', icon: SettingsIcon, text: 'Account settings' },
+  { href: '/support', icon: InfoCircleIcon, text: 'Support' },
 ]
 
 const toggleDropdown = () => {
@@ -79,10 +118,13 @@ const closeDropdown = () => {
   dropdownOpen.value = false
 }
 
-const signOut = () => {
-  // Implement sign out logic here
-  console.log('Signing out...')
-  closeDropdown()
+const handleSignOut = async () => {
+  try {
+    await signOut()
+    closeDropdown()
+  } catch (error) {
+    console.error('Sign out error:', error)
+  }
 }
 
 const handleClickOutside = (event) => {

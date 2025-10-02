@@ -17,4 +17,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    port: 5173,
+    proxy: {
+      '/kenea/api': {
+       /*  target: 'http://10.10.10.175:7070', */
+        target: 'http://10.231.61.5:7070',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+      },
+    },
+  },
 })

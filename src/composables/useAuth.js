@@ -1,143 +1,116 @@
 // src/composables/useAuth.js
-import { ref } from 'vue'
-import { useAuthStore } from '@/store/auth/auth'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/store/auth/auth'
 
-export function useAuth() {
-  const isLoading = ref(false)
-  const error = ref(null)
-  const successMessage = ref(null)
-  const router = useRouter()
+export const useAuth = () => {
   const authStore = useAuthStore()
-  
-  // ✅ NOUVEAU: Stocker le username pour l'OTP
-  const pendingUsername = ref(null)
+  const router = useRouter()
 
-  // ✅ AMÉLIORATION: Connexion initiale (email/phone + password)
+  const isLoading = computed(() => authStore.isLoading)
+  const error = computed(() => authStore.error)
+  const successMessage = computed(() => authStore.successMessage)
+  const user = computed(() => authStore.user)
+  const isAuthenticated = computed(() => authStore.isAuthenticated)
+  const userRoles = computed(() => authStore.userRoles)
+
+  // ✅ Vérifier si l'utilisateur a un rôle spécifique
+  const hasRole = (role) => {
+    return authStore.hasRole(role)
+  }
+
+  // ✅ Vérifier si l'utilisateur a au moins un des rôles
+  const hasAnyRole = (...roles) => {
+    return roles.some(role => authStore.hasRole(role))
+  }
+
+  // ✅ Vérifier si l'utilisateur a tous les rôles
+  const hasAllRoles = (...roles) => {
+    return roles.every(role => authStore.hasRole(role))
+  }
+
+  // ✅ Connexion (étape 1: email/phone + password)
   const signIn = async (credentials) => {
-    isLoading.value = true
-    error.value = null
-    successMessage.value = null
-
     try {
-      // Si c'est une vérification OTP
-      if (credentials.otp) {
-        const username = pendingUsername.value || credentials.username
-        
-        if (!username) {
-          throw new Error('Username non trouvé. Veuillez vous reconnecter.')
-        }
+      const result = await authStore.login(credentials)
 
-        const result = await authStore.verifyOtp(username, credentials.otp)
-        
-        if (result.success) {
-          // Stocker keepLoggedIn si nécessaire
-          if (credentials.keepLoggedIn) {
-            localStorage.setItem('keepLoggedIn', 'true')
-          } else {
-            localStorage.removeItem('keepLoggedIn')
-          }
-          
-          pendingUsername.value = null
-          router.push('/dashboard')
-          return result
-        } else {
-          error.value = result.error
-          throw new Error(result.error)
-        }
-      } 
-      // Sinon, c'est une connexion initiale
-      else {
-        const result = await authStore.login({
-          username: credentials.username,
-          password: credentials.password,
-        })
-
-        if (result.success) {
-          // Si OTP requis
-          if (result.requiresOtp) {
-            pendingUsername.value = credentials.username
-            successMessage.value = result.message || 'Un code de vérification a été envoyé'
-            router.push('/verify-otp')
-          } 
-          // Sinon connexion directe
-          else {
-            if (credentials.keepLoggedIn) {
-              localStorage.setItem('keepLoggedIn', 'true')
-            }
-            router.push('/dashboard')
-          }
-          return result
-        } else {
-          error.value = result.error
-          throw new Error(result.error)
-        }
+      if (result.success && result.requiresOtp) {
+        await router.push('/verify-otp')
+        return result
       }
+
+      if (result.success && !result.requiresOtp) {
+        await router.push('/dashboard')
+        return result
+      }
+
+      throw new Error(result.error || 'Erreur de connexion')
     } catch (err) {
-      console.error('Auth error:', err)
-      error.value = err.message || 'Erreur lors de la connexion'
+      console.error('Sign in error:', err)
       throw err
-    } finally {
-      isLoading.value = false
     }
   }
 
-  // ✅ AMÉLIORATION: Déconnexion
-  const signOut = async () => {
-    isLoading.value = true
-    error.value = null
+  // ✅ Vérification OTP (étape 2)
+  const verifyOtp = async (otp) => {
+    try {
+      const result = await authStore.verifyOtp(otp)
 
+      if (result.success) {
+        await router.push('/dashboard')
+        return result
+      }
+
+      throw new Error(result.error || 'Code OTP invalide')
+    } catch (err) {
+      console.error('OTP verification error:', err)
+      throw err
+    }
+  }
+
+  // ✅ Renvoyer le code OTP
+  const resendCode = async () => {
+    try {
+      const result = await authStore.resendOtp()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Erreur lors du renvoi du code')
+      }
+
+      return result
+    } catch (err) {
+      console.error('Resend code error:', err)
+      throw err
+    }
+  }
+
+  // ✅ Déconnexion
+  const signOut = async () => {
     try {
       await authStore.logout()
-      localStorage.removeItem('keepLoggedIn')
-      router.push('/signin')
+      await router.push('/signin')
     } catch (err) {
-      console.error('Logout error:', err)
-      error.value = err.message || 'Erreur lors de la déconnexion'
+      console.error('Sign out error:', err)
       throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  // ✅ AMÉLIORATION: Renvoyer le code OTP
-  const resendCode = async () => {
-    isLoading.value = true
-    error.value = null
-    successMessage.value = null
-
-    try {
-      const username = pendingUsername.value
-      
-      if (!username) {
-        throw new Error('Username non trouvé. Veuillez vous reconnecter.')
-      }
-
-      const result = await authStore.resendOtp(username)
-      
-      if (result.success) {
-        successMessage.value = result.message || 'Code renvoyé avec succès'
-        return result
-      } else {
-        error.value = result.error
-        throw new Error(result.error)
-      }
-    } catch (err) {
-      console.error('Resend OTP error:', err)
-      error.value = err.message || 'Erreur lors du renvoi du code'
-      throw err
-    } finally {
-      isLoading.value = false
     }
   }
 
   return {
-    signIn,
-    signOut,
-    resendCode,
+    // State
     isLoading,
     error,
     successMessage,
-    pendingUsername,
+    user,
+    isAuthenticated,
+    userRoles,
+    // Actions
+    signIn,
+    verifyOtp,
+    resendCode,
+    signOut,
+    // Role checks
+    hasRole,
+    hasAnyRole,
+    hasAllRoles,
   }
 }

@@ -1,35 +1,35 @@
 // src/api/services/authService.js
-import { callerService } from './caller_service'
+import apiClient from '../axios'
+
+const API_BASE = '/kenea/api/v3/security'
 
 // ✅ Connexion initiale (envoie email/phone + password)
 export const login = async (credentials) => {
   try {
-    const response = await callerService.Axios.post(
-      `${callerService.API_URL}authenticate`,
-      credentials
-    )
-    console.log('Raw login response:', response)
-    return response
+    const response = await apiClient.post(`${API_BASE}/login`, {
+      username: credentials.username,
+      password: credentials.password,
+    })
+    console.log('Login response:', response.data)
+    return response.data
   } catch (error) {
-    console.error('Login error:', error)
+    console.error('Login error:', error.response?.data || error.message)
     throw error
   }
 }
 
-// ✅ Vérification OTP
+// ✅ Vérification OTP - Attention à l'URL!
 export const verifyOtp = async ({ username, otp }) => {
   try {
-    const response = await callerService.Axios.post(
-      `${callerService.API_URL}verify`,
-      {
-        username,
-        otp,
-      }
+    // L'URL selon votre swagger: /verify/{code}/{username}
+    const response = await apiClient.post(
+      `${API_BASE}/verify/${otp}/${encodeURIComponent(username)}`,
+      {} // Body vide selon votre curl
     )
-    console.log('Raw OTP response:', response)
-    return response
+    console.log('OTP verification response:', response.data)
+    return response.data
   } catch (error) {
-    console.error('OTP error:', error)
+    console.error('OTP verification error:', error.response?.data || error.message)
     throw error
   }
 }
@@ -37,26 +37,13 @@ export const verifyOtp = async ({ username, otp }) => {
 // ✅ Renvoyer OTP
 export const resendOtp = async (username) => {
   try {
-    const response = await callerService.Axios.post(
-      `${callerService.API_URL}resend-otp`,
-      { username }
-    )
-    console.log('Raw resend OTP response:', response)
-    return response
+    const response = await apiClient.post('/kenea/api/v3/send-otp', {
+      username,
+    })
+    console.log('Resend OTP response:', response.data)
+    return response.data
   } catch (error) {
-    console.error('Resend OTP error:', error)
-    throw error
-  }
-}
-
-// ✅ Déconnexion
-export const logout = async () => {
-  try {
-    const response = await callerService.Axios.post(`${callerService.API_URL}logout`)
-    console.log('Raw logout response:', response)
-    return response
-  } catch (error) {
-    console.error('Logout error:', error)
+    console.error('Resend OTP error:', error.response?.data || error.message)
     throw error
   }
 }
@@ -64,11 +51,23 @@ export const logout = async () => {
 // ✅ Récupérer les infos utilisateur
 export const getUserInfo = async () => {
   try {
-    const response = await callerService.Axios.get(`${callerService.API_URL}v1/auth/me`)
-    console.log('Raw user info response:', response)
-    return response
+    const response = await apiClient.get('/kenea/api/v3/users/me')
+    /* console.log('User info response:', response.data) */
+    return response.data
   } catch (error) {
-    console.error('Get user info error:', error)
+    console.error('Get user info error:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+// ✅ Déconnexion
+export const logout = async () => {
+  try {
+    const response = await apiClient.post('/kenea/api/logout')
+    console.log('Logout response:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Logout error:', error.response?.data || error.message)
     throw error
   }
 }
