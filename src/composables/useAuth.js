@@ -40,7 +40,7 @@ export const useAuth = () => {
       }
 
       if (result.success && !result.requiresOtp) {
-        await router.push('/dashboard')
+        await router.push('/pharmacie')
         return result
       }
 
@@ -57,7 +57,7 @@ export const useAuth = () => {
       const result = await authStore.verifyOtp(otp)
 
       if (result.success) {
-        await router.push('/dashboard')
+        await router.push('/pharmacie')
         return result
       }
 

@@ -1,3 +1,4 @@
+//src/components/pays/PaysVilleMetrics.vue
 <template>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
     <!-- Pays Card -->

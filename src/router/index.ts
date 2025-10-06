@@ -29,7 +29,7 @@ const router = createRouter({
       meta: {
         title: 'Pharmacie',
         requiresAuth: true,
-        allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], // Exemple
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
       },
     },
     {
@@ -261,7 +261,7 @@ router.beforeEach((to, from, next) => {
   // ✅ Si c'est une page "guest" (signin, signup) et l'utilisateur est connecté
   if (isGuest && authStore.isAuthenticated) {
    /*  console.log('✅ Déjà connecté, redirection vers /dashboard') */
-    return next('/dashboard')
+    return next('/pharmacie')
   }
 
   next()

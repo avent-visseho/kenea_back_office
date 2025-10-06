@@ -1,26 +1,27 @@
+//src/views/pharmacie/Pharmacie.vue
 <template>
   <admin-layout>
     <div class="grid grid-cols-12 gap-4 md:gap-6">
       <div class="col-span-12">
-        <PharmacieMetrics />
+        <PharmacieMetrics/>
       </div>
 
       <div class="col-span-12">
-        <recent-orders />
+        <PharmaciesList/>
       </div>
     </div>
   </admin-layout>
 </template>
 
 <script>
-import AdminLayout from '../../components/layout/AdminLayout.vue'
-import RecentOrders from '../../components/pharmacie/RecentOrders.vue'
-import PharmacieMetrics from '../../components/pharmacie/PharmacieMetrics.vue'
+import PharmacieMetrics from '@/components/pharmacie/PharmacieMetrics.vue';
+import PharmaciesList from '@/components/pharmacie/PharmaciesList.vue';
+import AdminLayout from '../../components/layout/AdminLayout.vue';
 export default {
   components: {
     AdminLayout,
     PharmacieMetrics,
-    RecentOrders,
+    PharmaciesList,
   },
   name: 'Pharmacie',
 }
