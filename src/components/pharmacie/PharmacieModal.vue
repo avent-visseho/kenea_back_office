@@ -22,22 +22,33 @@
 
         <!-- Form -->
         <form @submit.prevent="handleSubmit" class="space-y-4">
-          <!-- Nom -->
-          <div>
-            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Nom de la pharmacie <span class="text-red-500">*</span>
-            </label>
-            <input v-model="form.nom" type="text" required
-              class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              placeholder="Ex: Pharmacie Centrale" />
-          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Nom -->
+            <div>
+              <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Nom de la pharmacie <span class="text-red-500">*</span>
+              </label>
+              <input v-model="form.name" type="text" required
+                class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                placeholder="Ex: Pharmacie Centrale" />
+            </div>
 
+            <!-- Devise -->
+            <div>
+              <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Devise <span class="text-red-500">*</span>
+              </label>
+              <input v-model="form.devise" type="text" required
+                class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                placeholder="Ex: XOF" />
+            </div>
+          </div>
           <!-- Ville -->
           <div>
             <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Ville <span class="text-red-500">*</span>
             </label>
-            <select v-model="form.ville_id" required
+            <select v-model="form.cityId" required
               class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
               <option value="">Sélectionner une ville</option>
               <option v-for="ville in citiesList" :key="ville.id || ville.code" :value="ville.id || ville.code">
@@ -49,11 +60,11 @@
           <!-- Adresse -->
           <div>
             <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Adresse <span class="text-red-500">*</span>
+              Altitude <span class="text-red-500">*</span>
             </label>
-            <input v-model="form.adresse" type="text" required
+            <input v-model="form.altitude" type="text" required
               class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              placeholder="Ex: 123 Rue de la Santé" />
+              placeholder="Ex: 123.5465" />
           </div>
 
           <!-- Téléphone -->
@@ -61,20 +72,20 @@
             <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Téléphone <span class="text-red-500">*</span>
             </label>
-            <input v-model="form.telephone" type="tel" required
+            <input v-model="form.phone" type="tel" required
               class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               placeholder="Ex: +212 5XX-XXXXXX" />
           </div>
 
           <!-- Email -->
-          <div>
+          <!-- <div>
             <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Email
             </label>
             <input v-model="form.email" type="email"
               class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               placeholder="Ex: contact@pharmacie.com" />
-          </div>
+          </div> -->
 
           <!-- Coordonnées GPS -->
           <div class="grid grid-cols-2 gap-4">
@@ -97,13 +108,13 @@
           </div>
 
           <!-- Statut -->
-          <div class="flex items-center gap-2">
+       <!--    <div class="flex items-center gap-2">
             <input v-model="form.active" type="checkbox" id="active"
               class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800" />
             <label for="active" class="text-sm font-medium text-gray-700 dark:text-gray-300">
               Pharmacie active
             </label>
-          </div>
+          </div> -->
 
           <!-- Erreur -->
           <div v-if="error" class="rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
@@ -154,11 +165,12 @@ const error = ref(null)
 const isEditMode = computed(() => !!props.pharmacieData)
 
 const form = ref({
-  nom: '',
-  ville_id: '',
-  adresse: '',
-  telephone: '',
-  email: '',
+  name: '',
+  devise: '',
+  cityId: '',
+  altitude: '',
+  phone: '',
+/*   email: '', */
   latitude: '',
   longitude: '',
   active: true
@@ -168,14 +180,14 @@ const handleSubmit = async () => {
   error.value = null
 
   const data = {
-    nom: form.value.nom,
-    ville_id: form.value.ville_id,
-    adresse: form.value.adresse,
-    telephone: form.value.telephone,
-    email: form.value.email || null,
+    name: form.value.name,
+    devise: form.value.devise,
+    cityId: form.value.cityId,
+    altitude: form.value.altitude,
+    phone: form.value.phone,
+  /*   email: form.value.email || null, */
     latitude: form.value.latitude || null,
     longitude: form.value.longitude || null,
-    active: form.value.active
   }
 
   let result
@@ -200,14 +212,14 @@ onMounted(async () => {
 
   if (isEditMode.value && props.pharmacieData) {
     form.value = {
-      nom: props.pharmacieData.nom || props.pharmacieData.name || '',
-      ville_id: props.pharmacieData.ville_id || props.pharmacieData.city_id || '',
-      adresse: props.pharmacieData.adresse || props.pharmacieData.address || '',
-      telephone: props.pharmacieData.telephone || props.pharmacieData.phone || '',
-      email: props.pharmacieData.email || '',
+      name: props.pharmacieData.name || props.pharmacieData.name || '',
+      devise: props.pharmacieData.devise || props.pharmacieData.devise || '',
+      cityId: props.pharmacieData.cityId || props.pharmacieData.city_id || '',
+      altitude: props.pharmacieData.altitude || props.pharmacieData.altitude || '',
+      phone: props.pharmacieData.phone || props.pharmacieData.phone || '',
+      /* email: props.pharmacieData.email || '', */
       latitude: props.pharmacieData.latitude || '',
-      longitude: props.pharmacieData.longitude || '',
-      active: props.pharmacieData.active ?? props.pharmacieData.statut === 'actif' ?? true
+      longitude: props.pharmacieData.longitude || ''
     }
   }
 })

@@ -1,9 +1,10 @@
+
 // src/api/axios.js
 import axios from 'axios'
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
+  timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 120000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -55,7 +56,7 @@ apiClient.interceptors.response.use(
     // Gérer les erreurs 401 (non autorisé)
     if (error.response?.status === 401) {
       // Nettoyer le token
-      localStorage.removeItem('auth_token')
+     /*  localStorage.removeItem('auth_token')
       localStorage.removeItem('auth_data')
       sessionStorage.removeItem('auth_token')
       sessionStorage.removeItem('auth_data')
@@ -63,7 +64,7 @@ apiClient.interceptors.response.use(
       // Rediriger vers la page de connexion (sauf si déjà dessus)
       if (window.location.pathname !== '/signin' && window.location.pathname !== '/verify-otp') {
         window.location.href = '/signin'
-      }
+      } */
     }
 
     return Promise.reject(error)

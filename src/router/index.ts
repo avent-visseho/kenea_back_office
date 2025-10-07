@@ -31,6 +31,24 @@ const router = createRouter({
         requiresAuth: true,
         /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
       },
+    },{
+      path: '/categorie',
+      name: 'categorie',
+      component: () => import('../views/pharmacie/CategorieView.vue'),
+      meta: {
+        title: 'Categorie',
+        requiresAuth: true,
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+      },
+    },{
+      path: '/produits',
+      name: 'produits',
+      component: () => import('../views/pharmacie/ProduitsView.vue'),
+      meta: {
+        title: 'produits',
+        requiresAuth: true,
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+      },
     },
     {
       path: '/groupe',

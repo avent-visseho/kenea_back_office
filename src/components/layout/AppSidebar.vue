@@ -173,6 +173,7 @@ const menuGroups = [
           { name: 'Pharmacie', path: '/pharmacie' },
           { name: 'Groupe', path: '/groupe' },
           { name: 'Pays', path: '/pays' },
+          { name: 'categorie', path: '/categorie' },
         ],
       },
       /* {

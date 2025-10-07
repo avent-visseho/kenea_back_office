@@ -164,9 +164,9 @@ export const useAuthStore = defineStore('auth', {
         }
       } catch (error) {
         console.error('Error fetching user info:', error)
-        if (error.response?.status === 401) {
-          this.logout()
-        }
+        /* if (error.response?.status === 401) {
+          this.logout() 
+        } */
       }
     },
 

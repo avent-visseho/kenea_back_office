@@ -1,3 +1,4 @@
+<!-- src/components/pharmacie/PharmaciesList.vue -->
 <template>
   <div
     class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
@@ -9,6 +10,28 @@
         </h3>
 
         <div class="flex items-center gap-3">
+          <!-- ✅ NOUVEAU: Bouton Import -->
+          <button
+            @click="showImportModal = true"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Importer CSV
+          </button>
+
+          <!-- ✅ NOUVEAU: Bouton Export -->
+          <button
+            @click="handleExport"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+            Exporter CSV
+          </button>
+
           <button @click="showFilterModal = true"
             class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
             <svg class="stroke-current fill-white dark:fill-gray-800" width="20" height="20" viewBox="0 0 20 20"
@@ -29,8 +52,7 @@
 
           <button @click="openCreateModal"
             class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600 shadow-theme-xs">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Nouvelle pharmacie
           </button>
@@ -62,9 +84,6 @@
             </th>
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Ville</p>
-            </th>
-            <th class="py-3 text-left">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Adresse</p>
             </th>
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Téléphone</p>
@@ -113,11 +132,6 @@
                 {{ getVilleName(pharmacie.ville_id || pharmacie.city_id) }}
               </p>
             </td>
-            <td class="py-3">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400 max-w-xs truncate">
-                {{ pharmacie.adresse || pharmacie.address || 'N/A' }}
-              </p>
-            </td>
             <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">
                 {{ pharmacie.telephone || pharmacie.phone || 'N/A' }}
@@ -162,11 +176,15 @@
     <PharmacieModal v-if="showPharmacieModal" :pharmacie-data="editingPharmacie" @close="closePharmacieModal"
       @success="handlePharmacieSuccess" />
 
-    <!-- <FilterModal v-if="showFilterModal" @close="showFilterModal = false" @apply="applyFilters" /> -->
+    <!-- ✅ NOUVEAU: Modal d'import CSV -->
+    <ImportPharmaciesCsvModal 
+      v-if="showImportModal" 
+      :cities-list="citiesList"
+      @close="showImportModal = false"
+      @import="handleImportCsv" 
+    />
 
-    <!-- Delete Confirmation Modal -->
-    <!-- <ConfirmDeleteModal v-if="showDeleteModal" :item-name="pharmacieToDelete?.nom || pharmacieToDelete?.name"
-      @close="showDeleteModal = false" @confirm="handleDelete" /> -->
+    <!-- <FilterModal v-if="showFilterModal" @close="showFilterModal = false" @apply="applyFilters" /> -->
   </div>
 </template>
 
@@ -175,18 +193,26 @@ import { ref, computed, onMounted } from 'vue'
 import { usePharmaciesVille } from '@/composables/pharmacie/usePharmacies'
 import { usePaysVille } from '@/composables/pays_ville/usePaysVille'
 import PharmacieModal from './PharmacieModal.vue'
-/* import FilterModal from './FilterModal.vue'
-import ConfirmDeleteModal from './ConfirmDeleteModal.vue' */
+import ImportPharmaciesCsvModal from './ImportPharmaciesCsvModal.vue' // ✅ NOUVEAU
 
-const { pharmaciesList, isLoading, fetchPharmaciesList, deletePharmacies } = usePharmaciesVille()
+const { 
+  pharmaciesList, 
+  isLoading, 
+  fetchPharmaciesList, 
+  deletePharmacies,
+  importPharmaciesCsv,  // ✅ NOUVEAU
+  exportPharmaciesCsv   // ✅ NOUVEAU
+} = usePharmaciesVille()
+
 const { citiesList, fetchCitiesList } = usePaysVille()
 
 const searchQuery = ref('')
 const showPharmacieModal = ref(false)
 const showFilterModal = ref(false)
-const showDeleteModal = ref(false)
+const showImportModal = ref(false)  // ✅ NOUVEAU
+//const showDeleteModal = ref(false)
 const editingPharmacie = ref(null)
-const pharmacieToDelete = ref(null)
+//const pharmacieToDelete = ref(null)
 
 const filteredPharmacies = computed(() => {
   if (!searchQuery.value) return pharmaciesList.value
@@ -228,21 +254,52 @@ const handlePharmacieSuccess = () => {
 }
 
 const confirmDelete = (pharmacie) => {
-  pharmacieToDelete.value = pharmacie
-  showDeleteModal.value = true
+  if (confirm(`Êtes-vous sûr de vouloir supprimer ${pharmacie.nom || pharmacie.name} ?`)) {
+    handleDelete(pharmacie)
+  }
 }
 
-const handleDelete = async () => {
-  if (!pharmacieToDelete.value) return
-
-  const id = pharmacieToDelete.value.id || pharmacieToDelete.value.uuid
+const handleDelete = async (pharmacie) => {
+  const id = pharmacie.id || pharmacie.uuid
   const result = await deletePharmacies(id)
 
   if (result.success) {
-    showDeleteModal.value = false
-    pharmacieToDelete.value = null
+    console.log('✅ Pharmacie supprimée avec succès')
   } else {
     alert(result.error || 'Erreur lors de la suppression')
+  }
+}
+
+// ✅ NOUVEAU: Gestion de l'import CSV
+const handleImportCsv = async ({ villeId, file }) => {
+  try {
+    console.log('📤 Import pharmacies pour ville:', villeId, 'fichier:', file.name)
+    
+    const result = await importPharmaciesCsv(file, villeId)
+
+    if (result.success) {
+      alert('Import réussi ! Pharmacies importées avec succès.')
+      showImportModal.value = false
+    } else {
+      alert(result.error || 'Erreur lors de l\'import')
+    }
+  } catch (error) {
+    console.error('❌ Erreur import pharmacies:', error)
+    alert('Erreur lors de l\'import du fichier')
+  }
+}
+
+// ✅ NOUVEAU: Gestion de l'export CSV
+const handleExport = () => {
+  try {
+    const result = exportPharmaciesCsv()
+
+    if (!result.success) {
+      alert(result.error || 'Erreur lors de l\'export')
+    }
+  } catch (error) {
+    console.error('❌ Erreur export:', error)
+    alert('Erreur lors de l\'export du fichier')
   }
 }
 

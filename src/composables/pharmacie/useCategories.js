@@ -1,63 +1,62 @@
-// src/composables/pharmacie/usePharmacies.js
+// src/composables/pharmacie/useCategories.js
 import { ref } from 'vue'
-import { PharmaciesService } from '../../api/services/pharmacie'
+import { ProduitsCategorieServices } from '@/api/services/categorie'
 
-const pharmaciesList = ref([])
+const categoriesList = ref([])
 const isLoading = ref(false)
 const error = ref(null)
 
-export function usePharmaciesVille() {
-  const fetchPharmaciesList = async () => {
+export function useProduitsCategorie() {
+  const fetchCategories = async () => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await PharmaciesService.getPharmaciesList()
-      console.log('✅ Pharmacies récupérées:', response.data)
+      const response = await ProduitsCategorieServices.getCategories()
+      console.log('✅ Catégories récupérées:', response.data)
 
       if (Array.isArray(response.data)) {
-        pharmaciesList.value = response.data
-        return { success: true, data: pharmaciesList.value }
+        categoriesList.value = response.data
+        return { success: true, data: categoriesList.value }
       }
 
       // Si les données sont dans response.data.body
       if (response.data.body && Array.isArray(response.data.body)) {
-        pharmaciesList.value = response.data.body
-        return { success: true, data: pharmaciesList.value }
+        categoriesList.value = response.data.body
+        return { success: true, data: categoriesList.value }
       }
 
-      return { success: false, error: 'Erreur lors du chargement des pharmacies' }
+      return { success: false, error: 'Erreur lors du chargement des catégories' }
     } catch (err) {
-      error.value = err.response?.data?.message || 'Erreur lors du chargement des pharmacies'
-      console.error('❌ Erreur fetchPharmaciesList:', err)
+      error.value = err.response?.data?.message || 'Erreur lors du chargement des catégories'
+      console.error('❌ Erreur fetchCategories:', err)
       return { success: false, error: error.value }
     } finally {
       isLoading.value = false
     }
   }
 
-  const createPharmacies = async (pharmaciesData) => {
+  const createCategorie = async (categorieData) => {
     isLoading.value = true
     error.value = null
 
     try {
-      console.log('📤 Création pharmacie avec données:', pharmaciesData)
+      console.log('📤 Création catégorie avec données:', categorieData)
       
-      const response = await PharmaciesService.addPharmacies(pharmaciesData)
+      const response = await ProduitsCategorieServices.addCategorie(categorieData)
       
       console.log('✅ Réponse création:', response.data)
 
-      // ✅ Gérer différents formats de réponse
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 201) {
-        const newPharmacie = response.data.body || response.data
+        const newCategorie = response.data.body || response.data
         
-        if (newPharmacie && typeof newPharmacie === 'object') {
-          pharmaciesList.value.push(newPharmacie)
+        if (newCategorie && typeof newCategorie === 'object') {
+          categoriesList.value.push(newCategorie)
         } else {
-          await fetchPharmaciesList()
+          await fetchCategories()
         }
         
-        return { success: true, data: newPharmacie }
+        return { success: true, data: newCategorie }
       }
       
       return { success: false, error: response.data.message || 'Erreur lors de la création' }
@@ -65,7 +64,7 @@ export function usePharmaciesVille() {
       const errorMsg = err.response?.data?.message || err.message || 'Erreur lors de la création'
       error.value = errorMsg
       
-      console.error('❌ Erreur createPharmacies:', {
+      console.error('❌ Erreur createCategorie:', {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status
@@ -77,31 +76,31 @@ export function usePharmaciesVille() {
     }
   }
 
-  const updatePharmacies = async (id, pharmaciesData) => {
+  const updateCategorie = async (id, categorieData) => {
     isLoading.value = true
     error.value = null
 
     try {
-      console.log('📤 Mise à jour pharmacie:', id, pharmaciesData)
+      console.log('📤 Mise à jour catégorie:', id, categorieData)
       
-      const response = await PharmaciesService.updatePharmacies(id, pharmaciesData)
+      const response = await ProduitsCategorieServices.updateCategorie(id, categorieData)
       
       console.log('✅ Réponse mise à jour:', response.data)
 
       if (response.data.status === 'SUCCESS' || response.status === 200) {
-        const updatedPharmacie = response.data.body || response.data
+        const updatedCategorie = response.data.body || response.data
         
-        const index = pharmaciesList.value.findIndex(p => 
-          p.id === id || p.uuid === id || p.code === id
+        const index = categoriesList.value.findIndex(c => 
+          c.id === id || c.uuid === id || c.code === id
         )
         
-        if (index !== -1 && updatedPharmacie && typeof updatedPharmacie === 'object') {
-          pharmaciesList.value[index] = updatedPharmacie
+        if (index !== -1 && updatedCategorie && typeof updatedCategorie === 'object') {
+          categoriesList.value[index] = updatedCategorie
         } else {
-          await fetchPharmaciesList()
+          await fetchCategories()
         }
         
-        return { success: true, data: updatedPharmacie }
+        return { success: true, data: updatedCategorie }
       }
       
       return { success: false, error: response.data.message || 'Erreur lors de la modification' }
@@ -109,7 +108,7 @@ export function usePharmaciesVille() {
       const errorMsg = err.response?.data?.message || err.message || 'Erreur lors de la modification'
       error.value = errorMsg
       
-      console.error('❌ Erreur updatePharmacies:', {
+      console.error('❌ Erreur updateCategorie:', {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status,
@@ -122,20 +121,20 @@ export function usePharmaciesVille() {
     }
   }
 
-  const deletePharmacies = async (id) => {
+  const deleteCategorie = async (id) => {
     isLoading.value = true
     error.value = null
 
     try {
-      console.log('📤 Suppression pharmacie:', id)
+      console.log('📤 Suppression catégorie:', id)
       
-      const response = await PharmaciesService.deletePharmacies(id)
+      const response = await ProduitsCategorieServices.deleteCategorie(id)
       
       console.log('✅ Réponse suppression:', response.data)
 
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 204) {
-        pharmaciesList.value = pharmaciesList.value.filter(p => 
-          p.id !== id && p.uuid !== id && p.code !== id
+        categoriesList.value = categoriesList.value.filter(c => 
+          c.id !== id && c.uuid !== id && c.code !== id
         )
         return { success: true }
       }
@@ -145,7 +144,7 @@ export function usePharmaciesVille() {
       const errorMsg = err.response?.data?.message || err.message || 'Erreur lors de la suppression'
       error.value = errorMsg
       
-      console.error('❌ Erreur deletePharmacies:', {
+      console.error('❌ Erreur deleteCategorie:', {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status
@@ -157,8 +156,7 @@ export function usePharmaciesVille() {
     }
   }
 
-  // ✅ NOUVEAU: Import CSV avec ville_id
-  const importPharmaciesCsv = async (file, villeId) => {
+  const importCategoriesCsv = async (file) => {
     isLoading.value = true
     error.value = null
 
@@ -166,35 +164,33 @@ export function usePharmaciesVille() {
       const formData = new FormData()
       formData.append('file', file)
 
-      console.log('📤 Upload pharmacies CSV pour ville:', villeId)
+      console.log('📤 Upload catégories CSV:', file.name)
 
-      const response = await PharmaciesService.importPharmaciesCsv(formData, villeId)
+      const response = await ProduitsCategorieServices.importCategoriesCsv(formData)
       
       if (response.data.status === 'SUCCESS' || response.status === 200) {
-        await fetchPharmaciesList()
+        await fetchCategories()
         return { success: true, data: response.data.body }
       }
       
       return { success: false, error: 'Erreur lors de l\'import du fichier CSV' }
     } catch (err) {
       error.value = err.response?.data?.message || 'Erreur lors de l\'import du fichier CSV'
-      console.error('❌ Erreur importPharmaciesCsv:', err)
+      console.error('❌ Erreur importCategoriesCsv:', err)
       return { success: false, error: error.value }
     } finally {
       isLoading.value = false
     }
   }
 
-  // ✅ NOUVEAU: Export CSV
-  const exportPharmaciesCsv = () => {
+  const exportCategoriesCsv = () => {
     try {
-      const headers = ['Nom', 'Ville', 'Téléphone', 'Statut']
+      const headers = ['Nom', 'Description', 'Date de création']
       
-      const rows = pharmaciesList.value.map(pharmacie => [
-        pharmacie.nom || pharmacie.name || '',
-        pharmacie.ville_nom || '',
-        pharmacie.telephone || pharmacie.phone || '',
-        pharmacie.active ? 'Actif' : 'Inactif'
+      const rows = categoriesList.value.map(categorie => [
+        categorie.nom || categorie.name || '',
+        categorie.description || '',
+        new Date(categorie.createdAt || categorie.created_at || Date.now()).toLocaleDateString('fr-FR')
       ])
 
       const csvContent = [
@@ -207,7 +203,7 @@ export function usePharmaciesVille() {
       const url = URL.createObjectURL(blob)
       
       link.setAttribute('href', url)
-      link.setAttribute('download', `pharmacies_${new Date().toISOString().slice(0, 10)}.csv`)
+      link.setAttribute('download', `categories_produits_${new Date().toISOString().slice(0, 10)}.csv`)
       link.style.visibility = 'hidden'
       
       document.body.appendChild(link)
@@ -216,7 +212,7 @@ export function usePharmaciesVille() {
 
       return { success: true }
     } catch (err) {
-      console.error('❌ Erreur exportPharmaciesCsv:', err)
+      console.error('❌ Erreur exportCategoriesCsv:', err)
       return { success: false, error: 'Erreur lors de l\'export CSV' }
     }
   }
@@ -224,12 +220,12 @@ export function usePharmaciesVille() {
   return {
     isLoading,
     error,
-    pharmaciesList,
-    fetchPharmaciesList,
-    createPharmacies,
-    updatePharmacies,
-    deletePharmacies,
-    importPharmaciesCsv,  // ✅ NOUVEAU
-    exportPharmaciesCsv,  // ✅ NOUVEAU
+    categoriesList,
+    fetchCategories,
+    createCategorie,
+    updateCategorie,
+    deleteCategorie,
+    importCategoriesCsv,
+    exportCategoriesCsv,
   }
 }

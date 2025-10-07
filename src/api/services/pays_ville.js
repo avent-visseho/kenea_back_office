@@ -7,6 +7,14 @@ const addPays = (data) => {
   return callerService.Axios.post(`${callerService.API_URL}v3/pays`, data)
 }
 
+const importPaysCsv = (formData) => {
+  return callerService.Axios.post(`${callerService.API_URL}v3/pays/import/csv`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
 const getPaysList = () => {
   return callerService.Axios.get(`${callerService.API_URL}v3/pays/all/all`)
 }
@@ -18,7 +26,7 @@ const getPaysById = (id) => {
 
 const updatePays = (id, data) => {
   // ✅ CORRECTION: v3/pays/update/${id} était mal formaté
-   return callerService.Axios.put(`${callerService.API_URL}v3/pays/update/${id}?id=${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}v3/pays/update/${id}?id=${id}`, data)
 }
 
 const deletePays = (id) => {
@@ -26,10 +34,21 @@ const deletePays = (id) => {
   return callerService.Axios.delete(`${callerService.API_URL}v3/pays/delete/${id}`)
 }
 
-
 // ============= CITIES =============
 const addCities = (data) => {
   return callerService.Axios.post(`${callerService.API_URL}v3/cities`, data)
+}
+
+const importCitiesCsv = (formData, paysId) => {
+  return callerService.Axios.post(
+    `${callerService.API_URL}v3/cities/import/${paysId}`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  )
 }
 
 const getCitiesList = () => {
@@ -52,6 +71,7 @@ const deleteCities = (id) => {
 export const PaysVilleService = {
   // Pays
   addPays,
+  importPaysCsv,
   getPaysList,
   getPaysById,
   updatePays,
@@ -59,6 +79,7 @@ export const PaysVilleService = {
 
   // Cities
   addCities,
+  importCitiesCsv,
   getCitiesList,
   getCitiesById,
   updateCities,

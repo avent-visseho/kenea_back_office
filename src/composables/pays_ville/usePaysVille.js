@@ -59,6 +59,69 @@ export function usePaysVille() {
     }
   }
 
+  const importPaysCsv = async (file) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await PaysVilleService.importPaysCsv(formData)
+      if (response.data.status === 'SUCCESS') {
+        // Recharger la liste après l'import
+        await fetchPaysList()
+        return { success: true, data: response.data.body }
+      }
+      return { success: false, error: "Erreur lors de l'import du fichier CSV" }
+    } catch (err) {
+      error.value = err.response?.data?.message || "Erreur lors de l'import du fichier CSV"
+      console.error('Erreur importPaysCsv:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // ✅ NOUVEAU: Export CSV pour Pays
+  const exportPaysCsv = () => {
+    try {
+      // Créer les headers CSV
+      const headers = ['Nom', 'Code', 'Indicatif']
+
+      // Créer les lignes de données
+      const rows = paysList.value.map((pays) => [
+        pays.nom || pays.name || '',
+        pays.code || '',
+        pays.indicatif || '',
+      ])
+
+      // Combiner headers et rows
+      const csvContent = [
+        headers.join(','),
+        ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+      ].join('\n')
+
+      // Créer un blob et déclencher le téléchargement
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+
+      link.setAttribute('href', url)
+      link.setAttribute('download', `pays_${new Date().toISOString().slice(0, 10)}.csv`)
+      link.style.visibility = 'hidden'
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      return { success: true }
+    } catch (err) {
+      console.error('Erreur exportPaysCsv:', err)
+      return { success: false, error: "Erreur lors de l'export CSV" }
+    }
+  }
+
   const updatePays = async (id, paysData) => {
     isLoading.value = true
     error.value = null
@@ -67,7 +130,7 @@ export function usePaysVille() {
       const response = await PaysVilleService.updatePays(id, paysData)
       if (response.data.status === 'SUCCESS') {
         // Mettre à jour directement dans la liste
-        const index = paysList.value.findIndex(p => p.id === id || p.code === id)
+        const index = paysList.value.findIndex((p) => p.id === id || p.code === id)
         if (index !== -1 && response.data.body) {
           paysList.value[index] = response.data.body
         } else {
@@ -94,7 +157,7 @@ export function usePaysVille() {
       const response = await PaysVilleService.deletePays(id)
       if (response.data.status === 'SUCCESS') {
         // Supprimer directement de la liste
-        paysList.value = paysList.value.filter(p => p.id !== id && p.code !== id)
+        paysList.value = paysList.value.filter((p) => p.id !== id && p.code !== id)
         return { success: true }
       }
       return { success: false, error: 'Erreur lors de la suppression du pays' }
@@ -153,6 +216,68 @@ export function usePaysVille() {
     }
   }
 
+  const importCitiesCsv = async (file, paysId) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      // Optionnel : si le backend attend aussi le paysId dans le FormData
+      // formData.append('paysId', paysId)
+
+      console.log('📤 Upload ville CSV pour pays:', paysId)
+
+      const response = await PaysVilleService.importCitiesCsv(formData, paysId)
+      if (response.data.status === 'SUCCESS') {
+        await fetchCitiesList()
+        return { success: true, data: response.data.body }
+      }
+      return { success: false, error: "Erreur lors de l'import du fichier CSV" }
+    } catch (err) {
+      error.value = err.response?.data?.message || "Erreur lors de l'import du fichier CSV"
+      console.error('Erreur importCitiesCsv:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // ✅ NOUVEAU: Export CSV pour Villes
+  const exportCitiesCsv = () => {
+    try {
+      const headers = ['Nom', 'Pays']
+
+      const rows = citiesList.value.map((ville) => {
+        const paysNom =
+          paysList.value.find((p) => p.id === (ville.paysId || ville.pays_id))?.nom || '-'
+        return [ville.nom || ville.name || '', paysNom]
+      })
+
+      const csvContent = [
+        headers.join(','),
+        ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+      ].join('\n')
+
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+
+      link.setAttribute('href', url)
+      link.setAttribute('download', `villes_${new Date().toISOString().slice(0, 10)}.csv`)
+      link.style.visibility = 'hidden'
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      return { success: true }
+    } catch (err) {
+      console.error('Erreur exportCitiesCsv:', err)
+      return { success: false, error: "Erreur lors de l'export CSV" }
+    }
+  }
+
   const updateCities = async (id, citiesData) => {
     isLoading.value = true
     error.value = null
@@ -161,7 +286,7 @@ export function usePaysVille() {
       const response = await PaysVilleService.updateCities(id, citiesData)
       if (response.data.status === 'SUCCESS') {
         // Mettre à jour directement dans la liste
-        const index = citiesList.value.findIndex(c => c.id === id || c.code === id)
+        const index = citiesList.value.findIndex((c) => c.id === id || c.code === id)
         if (index !== -1 && response.data.body) {
           citiesList.value[index] = response.data.body
         } else {
@@ -187,7 +312,7 @@ export function usePaysVille() {
       const response = await PaysVilleService.deleteCities(id)
       if (response.data.status === 'SUCCESS') {
         // Supprimer directement de la liste
-        citiesList.value = citiesList.value.filter(c => c.id !== id && c.code !== id)
+        citiesList.value = citiesList.value.filter((c) => c.id !== id && c.code !== id)
         return { success: true }
       }
       return { success: false, error: 'Erreur lors de la suppression de la ville' }
@@ -210,12 +335,16 @@ export function usePaysVille() {
     // Méthodes Pays
     fetchPaysList,
     createPays,
+    importPaysCsv,
+    exportPaysCsv,
     updatePays,
     deletePays,
 
     // Méthodes Villes
     fetchCitiesList,
     createCities,
+    importCitiesCsv,
+    exportCitiesCsv,
     updateCities,
     deleteCities,
   }

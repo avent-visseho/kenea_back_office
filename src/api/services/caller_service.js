@@ -4,7 +4,7 @@ import router from '@/router'
 
 // ✅ CORRECTION: Utilisation de import.meta.env au lieu de VITE_API_BASE_URL directement
 const API_HOST_SERVEUR = import.meta.env.VITE_API_BASE_URL
-const API_URL = API_HOST_SERVEUR + 'kenea/api/'
+const API_URL = `${API_HOST_SERVEUR.replace(/\/$/, '')}/kenea/api/`
 
 const Axios = axios.create({
   baseURL: API_HOST_SERVEUR,
@@ -15,39 +15,35 @@ const Axios = axios.create({
 })
 
 // Intercepteur de requête - ajouter le token automatiquement
-Axios.interceptors.request.use(
-  (request) => {
-    /* console.log('📤 Request:', {
-      url: request.url,
-      method: request.method,
-      hasToken: !!request.headers.Authorization,
-    }) */ // ⬅️ Ajoute ce log
+Axios.interceptors.request.use((request) => {
+  const raw = localStorage.getItem('auth_data')
+  if (!raw) return request
 
-    const authData = localStorage.getItem('auth_data')
+  try {
+    const parsed = JSON.parse(raw)
+    const token =
+      parsed.tokens?.access_token ||
+      parsed.access_token ||
+      parsed.token ||
+      parsed.data?.token ||
+      parsed.data?.jwt ||
+      null
 
-    if (authData) {
-      try {
-        const parsed = JSON.parse(authData)
+    const type =
+      parsed.tokens?.token_type || parsed.token_type || parsed.data?.token_type || 'Bearer'
 
-        // ⬅️ Essaie différentes structures possibles
-        const token = parsed.tokens?.access_token || parsed.access_token || parsed.token
-        const tokenType = parsed.tokens?.token_type || parsed.token_type || 'Bearer'
-
-        if (token) {
-          request.headers.Authorization = `${tokenType} ${token}`
-        } else {
-        }
-      } catch (error) {
-      }
+    if (token) {
+      request.headers.Authorization = `${type} ${token}`
+      console.log('✅ Token attached:', request.headers.Authorization)
     } else {
+      console.warn('⚠️ Aucun token trouvé dans auth_data')
     }
+  } catch (err) {
+    console.error('Erreur parsing auth_data:', err)
+  }
 
-    return request
-  },
-  (error) => {
-    return Promise.reject(error)
-  },
-)
+  return request
+})
 
 // Intercepteur de réponse - gérer les erreurs d'authentification
 Axios.interceptors.response.use(
