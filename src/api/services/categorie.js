@@ -1,31 +1,28 @@
-// src/api/services/categorie.js
 import { callerService } from './caller_service'
 
-const getCategories = () => {
-  return callerService.Axios.get(`api/v1/categories`) //${callerService.API_URL}
+const getCategories = (params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}categories`, { params })
 }
 
-const getCategorieById = (id) => {
-  return callerService.Axios.get(`api/v1/categories/${id}`)
+const getCategorieById = (id, params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}categories/${id}`, { params })
 }
 
 const addCategorie = (data) => {
-  return callerService.Axios.post(`api/v1/categories`, data)
+  return callerService.Axios.post(`${callerService.API_URL}categories`, data)
 }
 
 const updateCategorie = (id, data) => {
-  return callerService.Axios.put(`api/v1/categories/${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}categories/${id}`, data)
 }
 
 const deleteCategorie = (id) => {
-  return callerService.Axios.delete(`api/v1/categories/${id}`)
+  return callerService.Axios.delete(`${callerService.API_URL}categories/${id}`)
 }
 
 const importCategoriesCsv = (formData) => {
-  return callerService.Axios.post(`api/v1/categories/import`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  return callerService.Axios.post(`${callerService.API_URL}categories/import`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   })
 }
 

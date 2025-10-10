@@ -195,7 +195,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted ,ref} from 'vue'
 import { usePharmaciesVille } from '@/composables/pharmacie/usePharmacies'
 import { usePaysVille } from '@/composables/pays_ville/usePaysVille'
 
@@ -204,6 +204,9 @@ const { citiesList, fetchCitiesList } = usePaysVille()
 
 // Nombre total de pharmacies
 const pharmaciesCount = computed(() => pharmaciesList.value.length)
+
+const showDeleted = ref(false)
+
 
 // Nombre de villes couvertes (avec au moins une pharmacie)
 const villesCouvertes = computed(() => {
@@ -239,10 +242,10 @@ const averagePerVille = computed(() => {
 onMounted(async () => {
   // Charger les données si elles ne sont pas déjà chargées
   if (pharmaciesList.value.length === 0) {
-    await fetchPharmaciesList()
+    await fetchPharmaciesList(showDeleted.value)
   }
   if (citiesList.value.length === 0) {
-    await fetchCitiesList()
+    await fetchCitiesList(showDeleted.value)
   }
 })
 </script>

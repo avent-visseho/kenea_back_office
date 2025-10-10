@@ -213,6 +213,8 @@ const showImportModal = ref(false)  // ✅ NOUVEAU
 //const showDeleteModal = ref(false)
 const editingPharmacie = ref(null)
 //const pharmacieToDelete = ref(null)
+const showDeleted = ref(false)
+
 
 const filteredPharmacies = computed(() => {
   if (!searchQuery.value) return pharmaciesList.value
@@ -310,10 +312,10 @@ const applyFilters = (filters) => {
 
 onMounted(async () => {
   if (pharmaciesList.value.length === 0) {
-    await fetchPharmaciesList()
+    await fetchPharmaciesList(showDeleted.value)
   }
   if (citiesList.value.length === 0) {
-    await fetchCitiesList()
+    await fetchCitiesList(showDeleted.value)
   }
 })
 </script>

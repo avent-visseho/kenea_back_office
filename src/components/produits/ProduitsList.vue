@@ -5,7 +5,7 @@
     <div class="flex flex-col gap-4 mb-4">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Gestion des Produits
+          Gestion des Produits{{ produitsList }}
         </h3>
 
         <div class="flex items-center gap-3">
@@ -189,6 +189,8 @@ const searchQuery = ref('')
 const showProduitModal = ref(false)
 const showImportModal = ref(false)
 const editingProduit = ref(null)
+const showDeleted = ref(false)
+
 
 const filteredProduits = computed(() => {
   if (!searchQuery.value) return produitsList.value
@@ -277,13 +279,13 @@ const handleExport = () => {
 
 onMounted(async () => {
   if (produitsList.value.length === 0) {
-    await fetchProduitsList()
+    await fetchProduitsList(showDeleted.value)
   }
   if (pharmaciesList.value.length === 0) {
-    await fetchPharmaciesList()
+    await fetchPharmaciesList(showDeleted.value)
   }
   if (categoriesList.value.length === 0) {
-    await fetchCategories()
+    await fetchCategories(showDeleted.value)
   }
 })
 </script>

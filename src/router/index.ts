@@ -49,6 +49,15 @@ const router = createRouter({
         requiresAuth: true,
         /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
       },
+    },{
+      path: '/users',
+      name: 'users',
+      component: () => import('../views/users/Userview.vue'),
+      meta: {
+        title: 'users',
+        requiresAuth: true,
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+      },
     },
     {
       path: '/groupe',
@@ -81,13 +90,23 @@ const router = createRouter({
       },
     },
     {
+      path: '/ordonnance',
+      name: 'ordonnance',
+      component: () => import('../views/ordonnance/OrdonnancesView.vue'),
+      meta: {
+        title: 'Ordonnance',
+        requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+      },
+    },
+    {
       path: '/profile',
       name: 'Profile',
       component: () => import('../views/Others/UserProfile.vue'),
       meta: {
         title: 'Profile',
         requiresAuth: true,
-        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], // Tout le monde peut voir son profil
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {

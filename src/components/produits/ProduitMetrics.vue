@@ -121,7 +121,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted,ref } from 'vue'
 import { useProduits } from '@/composables/pharmacie/useProduits'
 import { usePharmaciesVille } from '@/composables/pharmacie/usePharmacies'
 import { useProduitsCategorie } from '@/composables/pharmacie/useCategories'
@@ -129,6 +129,9 @@ import { useProduitsCategorie } from '@/composables/pharmacie/useCategories'
 const { produitsList, fetchProduitsList } = useProduits()
 const { pharmaciesList, fetchPharmaciesList } = usePharmaciesVille()
 const { categoriesList, fetchCategories } = useProduitsCategorie()
+
+const showDeleted = ref(false)
+
 
 const totalProduits = computed(() => {
   return produitsList.value.length
@@ -167,13 +170,13 @@ const formatPrice = (price) => {
 
 onMounted(async () => {
   if (produitsList.value.length === 0) {
-    await fetchProduitsList()
+    await fetchProduitsList(showDeleted.value)
   }
   if (pharmaciesList.value.length === 0) {
-    await fetchPharmaciesList()
+    await fetchPharmaciesList(showDeleted.value)
   }
   if (categoriesList.value.length === 0) {
-    await fetchCategories()
+    await fetchCategories(showDeleted.value)
   }
 })
 </script>

@@ -10,13 +10,12 @@ const error = ref(null)
 
 export function usePaysVille() {
   // ============= PAYS =============
-  const fetchPaysList = async () => {
+  const fetchPaysList = async (deleted = false) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await PaysVilleService.getPaysList()
-      console.log(response, 'pays')
+      const response = await PaysVilleService.getPaysList({ deleted })
 
       if (response.data.status === 'SUCCESS') {
         paysList.value = response.data.body || []
@@ -171,12 +170,12 @@ export function usePaysVille() {
   }
 
   // ============= VILLES =============
-  const fetchCitiesList = async () => {
+  const fetchCitiesList = async (deleted = false) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await PaysVilleService.getCitiesList()
+      const response = await PaysVilleService.getCitiesList({ deleted })
       if (response.data.status === 'SUCCESS') {
         citiesList.value = response.data.body || []
         return { success: true, data: citiesList.value }
@@ -225,8 +224,6 @@ export function usePaysVille() {
       formData.append('file', file)
       // Optionnel : si le backend attend aussi le paysId dans le FormData
       // formData.append('paysId', paysId)
-
-      console.log('📤 Upload ville CSV pour pays:', paysId)
 
       const response = await PaysVilleService.importCitiesCsv(formData, paysId)
       if (response.data.status === 'SUCCESS') {

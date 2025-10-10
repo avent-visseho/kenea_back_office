@@ -10,28 +10,39 @@
     },
   ]" @mouseenter="!isExpanded && (isHovered = true)" @mouseleave="isHovered = false">
     <div :class="['py-8 flex', !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start']">
-      <router-link to="/">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" width="320" height="64" role="img"
-          aria-labelledby="title desc">
-          <title id="title">Kenea logo</title>
-          <desc id="desc">Icône carrée arrondie verte avec la lettre K blanche, suivi du texte Kenea en vert.</desc>
-
-          <!-- Couleur principale (vert) : #28A745 -->
-          <!-- Icône : carré arrondi -->
-          <rect x="0" y="4" width="56" height="56" rx="12" ry="12" fill="#28A745" />
-
-          <!-- Lettre K blanche centrée dans l'icône -->
-          <text x="28" y="32" text-anchor="middle" dominant-baseline="middle"
-            font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="28" font-weight="700" fill="#ffffff">K</text>
-
-          <!-- Texte Kenea à droite -->
-          <text x="80" y="32" dominant-baseline="middle" font-family="Segoe UI, Roboto, Arial, sans-serif"
-            font-size="32" font-weight="700" fill="#28A745">Kenea</text>
-        </svg>
-
-        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="/images/logo/logo-dark.svg"
+      <!-- <router-link to="/">
+        <img   src="/images/logo/logo_Kenea_1.png"
+          alt="Logo" width="40" height="40" />
+        
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="/images/logo/logo_Kenea_1.png"
           alt="Logo" width="150" height="40" />
         <img v-else src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
+      </router-link> -->
+
+      <router-link to="/">
+        <img
+          v-if="isExpanded || isHovered || isMobileOpen"
+          class="dark:hidden"
+          src="/images/logo/logo_Kenea_1.png"
+          alt="Logo"
+          width="50"
+          height="40"
+        />
+        <img
+          v-if="isExpanded || isHovered || isMobileOpen"
+          class="hidden dark:block"
+          src="/images/logo/logo_Kenea_1.png"
+          alt="Logo"
+          width="50"
+          height="40"
+        />
+        <img
+          v-else
+          src="/images/logo/logo_Kenea_1.png"
+          alt="Logo"
+          width="32"
+          height="32"
+        />
       </router-link>
     </div>
     <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
@@ -163,18 +174,23 @@ const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar()
 
 const menuGroups = [
   {
-    title: 'Menu',
     items: [
       {
         icon: GridIcon,
-        name: 'Dashboard',
+        name: 'Tableau de bord',
         subItems: [
           /* { name: 'Dashboard', path: '/dashboard' }, */
-          { name: 'Pharmacie', path: '/pharmacie' },
-          { name: 'Groupe', path: '/groupe' },
           { name: 'Pays', path: '/pays' },
+          { name: 'Pharmacie', path: '/pharmacie' },
           { name: 'categorie', path: '/categorie' },
+          { name: 'produits', path: '/produits' },
+          { name: 'users', path: '/users' },
         ],
+      },
+       {
+        icon: CalenderIcon,
+        name: 'ordonnaces',
+        path: '/ordonnaces',
       },
       /* {
         icon: CalenderIcon,

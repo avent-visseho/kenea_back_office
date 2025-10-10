@@ -10,12 +10,12 @@ const error = ref(null)
 export function useProduits() {
   // ============= PRODUITS =============
   
-  const fetchProduitsList = async () => {
+  const fetchProduitsList = async (deleted = false) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await ProduitService.getProduitsList()
+      const response = await ProduitService.getProduitsList({ deleted })
       console.log('✅ Produits récupérés:', response.data)
 
       if (response.data.status === 'SUCCESS') {

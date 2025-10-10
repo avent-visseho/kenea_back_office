@@ -7,13 +7,12 @@ const isLoading = ref(false)
 const error = ref(null)
 
 export function useProduitsCategorie() {
-  const fetchCategories = async () => {
+  const fetchCategories = async (deleted = false) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await ProduitsCategorieServices.getCategories()
-      console.log('✅ Catégories récupérées:', response.data)
+      const response = await ProduitsCategorieServices.getCategories({ deleted })
 
       if (Array.isArray(response.data)) {
         categoriesList.value = response.data
@@ -41,11 +40,8 @@ export function useProduitsCategorie() {
     error.value = null
 
     try {
-      console.log('📤 Création catégorie avec données:', categorieData)
       
       const response = await ProduitsCategorieServices.addCategorie(categorieData)
-      
-      console.log('✅ Réponse création:', response.data)
 
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 201) {
         const newCategorie = response.data.body || response.data
@@ -81,11 +77,8 @@ export function useProduitsCategorie() {
     error.value = null
 
     try {
-      console.log('📤 Mise à jour catégorie:', id, categorieData)
       
       const response = await ProduitsCategorieServices.updateCategorie(id, categorieData)
-      
-      console.log('✅ Réponse mise à jour:', response.data)
 
       if (response.data.status === 'SUCCESS' || response.status === 200) {
         const updatedCategorie = response.data.body || response.data
@@ -126,11 +119,8 @@ export function useProduitsCategorie() {
     error.value = null
 
     try {
-      console.log('📤 Suppression catégorie:', id)
       
       const response = await ProduitsCategorieServices.deleteCategorie(id)
-      
-      console.log('✅ Réponse suppression:', response.data)
 
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 204) {
         categoriesList.value = categoriesList.value.filter(c => 
@@ -163,8 +153,6 @@ export function useProduitsCategorie() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-
-      console.log('📤 Upload catégories CSV:', file.name)
 
       const response = await ProduitsCategorieServices.importCategoriesCsv(formData)
       

@@ -1,48 +1,44 @@
-// src/api/services/pharmacie.js
 import { callerService } from './caller_service'
 
 const addPharmacies = (data) => {
-  return callerService.Axios.post(`${callerService.API_URL}v3/pharmacies`, data)
+  return callerService.Axios.post(`${callerService.API_URL}pharmacies`, data)
 }
 
 const addPharmaciesConfirmationIdenity = (data) => {
-  return callerService.Axios.post(`${callerService.API_URL}v3/notifications/confirmation/confirm-identity`, data)
+  return callerService.Axios.post(
+    `${callerService.API_URL}notifications/confirmation/confirm-identity`,
+    data
+  )
 }
 
 const resetPaswword = (data) => {
-  return callerService.Axios.post(`${callerService.API_URL}v3/security/reset-password`, data)
+  return callerService.Axios.post(`${callerService.API_URL}security/reset-password`, data)
 }
 
-// ✅ NOUVEAU: Import CSV avec ville_id
 const importPharmaciesCsv = (formData, villeId) => {
   return callerService.Axios.post(
-    `${callerService.API_URL}v3/pharmacies/import/${villeId}`,
+    `${callerService.API_URL}pharmacies/import/${villeId}`,
     formData,
     {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
+      headers: { 'Content-Type': 'multipart/form-data' },
     }
   )
 }
 
-
-const getPharmaciesList = () => {
-  return callerService.Axios.get(`${callerService.API_URL}v3/pharmacies`)
+const getPharmaciesList = (params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}pharmacies`, { params })
 }
 
-const getPharmaciesById = (uuid) => {
-  return callerService.Axios.get(`${callerService.API_URL}v3/pharmacies/${uuid}`)
+const getPharmaciesById = (uuid, params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}pharmacies/${uuid}`, { params })
 }
-
 
 const updatePharmacies = (uuid, data) => {
-  return callerService.Axios.put(`${callerService.API_URL}v3/pharmacies/${uuid}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}pharmacies/${uuid}`, data)
 }
 
-
 const deletePharmacies = (uuid) => {
-  return callerService.Axios.delete(`${callerService.API_URL}v3/pharmacies/${uuid}`)
+  return callerService.Axios.delete(`${callerService.API_URL}pharmacies/${uuid}`)
 }
 
 export const PharmaciesService = {
@@ -53,5 +49,5 @@ export const PharmaciesService = {
   deletePharmacies,
   addPharmaciesConfirmationIdenity,
   resetPaswword,
-  importPharmaciesCsv,  // ✅ NOUVEAU
+  importPharmaciesCsv,
 }

@@ -7,13 +7,12 @@ const isLoading = ref(false)
 const error = ref(null)
 
 export function usePharmaciesVille() {
-  const fetchPharmaciesList = async () => {
+  const fetchPharmaciesList = async (deleted = false) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await PharmaciesService.getPharmaciesList()
-      console.log('✅ Pharmacies récupérées:', response.data)
+      const response = await PharmaciesService.getPharmaciesList({ deleted })
 
       if (Array.isArray(response.data)) {
         pharmaciesList.value = response.data
@@ -41,11 +40,8 @@ export function usePharmaciesVille() {
     error.value = null
 
     try {
-      console.log('📤 Création pharmacie avec données:', pharmaciesData)
       
       const response = await PharmaciesService.addPharmacies(pharmaciesData)
-      
-      console.log('✅ Réponse création:', response.data)
 
       // ✅ Gérer différents formats de réponse
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 201) {
@@ -82,11 +78,9 @@ export function usePharmaciesVille() {
     error.value = null
 
     try {
-      console.log('📤 Mise à jour pharmacie:', id, pharmaciesData)
       
       const response = await PharmaciesService.updatePharmacies(id, pharmaciesData)
       
-      console.log('✅ Réponse mise à jour:', response.data)
 
       if (response.data.status === 'SUCCESS' || response.status === 200) {
         const updatedPharmacie = response.data.body || response.data
@@ -127,11 +121,9 @@ export function usePharmaciesVille() {
     error.value = null
 
     try {
-      console.log('📤 Suppression pharmacie:', id)
       
       const response = await PharmaciesService.deletePharmacies(id)
       
-      console.log('✅ Réponse suppression:', response.data)
 
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 204) {
         pharmaciesList.value = pharmaciesList.value.filter(p => 
@@ -165,8 +157,6 @@ export function usePharmaciesVille() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-
-      console.log('📤 Upload pharmacies CSV pour ville:', villeId)
 
       const response = await PharmaciesService.importPharmaciesCsv(formData, villeId)
       

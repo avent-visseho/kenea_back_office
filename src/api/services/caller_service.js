@@ -4,7 +4,7 @@ import router from '@/router'
 
 // ✅ CORRECTION: Utilisation de import.meta.env au lieu de VITE_API_BASE_URL directement
 const API_HOST_SERVEUR = import.meta.env.VITE_API_BASE_URL
-const API_URL = `${API_HOST_SERVEUR.replace(/\/$/, '')}/kenea/api/`
+const API_URL = `${API_HOST_SERVEUR.replace(/\/$/, '')}/kenea/api/v3/`
 
 const Axios = axios.create({
   baseURL: API_HOST_SERVEUR,

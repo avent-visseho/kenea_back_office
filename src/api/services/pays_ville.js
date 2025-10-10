@@ -1,71 +1,61 @@
-// src/api/services/pays_ville.js
 import { callerService } from './caller_service'
 
-// ============= PAYS =============
+// ======== PAYS ========
 const addPays = (data) => {
-  // ✅ CORRECTION: Utilisation correcte des template literals avec backticks
-  return callerService.Axios.post(`${callerService.API_URL}v3/pays`, data)
+  return callerService.Axios.post(`${callerService.API_URL}pays`, data)
 }
 
 const importPaysCsv = (formData) => {
-  return callerService.Axios.post(`${callerService.API_URL}v3/pays/import/csv`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  return callerService.Axios.post(`${callerService.API_URL}pays/import/csv`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   })
 }
 
-const getPaysList = () => {
-  return callerService.Axios.get(`${callerService.API_URL}v3/pays/all/all`)
+const getPaysList = (params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}pays/all/all`, { params })
 }
 
-const getPaysById = (id) => {
-  // ✅ CORRECTION: v3/pays/read/${id} était mal formaté
-  return callerService.Axios.get(`${callerService.API_URL}v3/pays/read/${id}`)
+const getPaysById = (id, params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}pays/read/${id}`, { params })
 }
 
 const updatePays = (id, data) => {
-  // ✅ CORRECTION: v3/pays/update/${id} était mal formaté
-  return callerService.Axios.put(`${callerService.API_URL}v3/pays/update/${id}?id=${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}pays/update/${id}?id=${id}`, data)
 }
 
 const deletePays = (id) => {
-  // ✅ CORRECTION: v3/pays/delete/${id} était mal formaté
-  return callerService.Axios.delete(`${callerService.API_URL}v3/pays/delete/${id}`)
+  return callerService.Axios.delete(`${callerService.API_URL}pays/delete/${id}`)
 }
 
-// ============= CITIES =============
+// ======== VILLES ========
 const addCities = (data) => {
-  return callerService.Axios.post(`${callerService.API_URL}v3/cities`, data)
+  return callerService.Axios.post(`${callerService.API_URL}cities`, data)
 }
 
 const importCitiesCsv = (formData, paysId) => {
   return callerService.Axios.post(
-    `${callerService.API_URL}v3/cities/import/${paysId}`,
+    `${callerService.API_URL}cities/import/${paysId}`,
     formData,
     {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     }
   )
 }
 
-const getCitiesList = () => {
-  return callerService.Axios.get(`${callerService.API_URL}v3/cities`)
+const getCitiesList = (params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}cities`, { params })
 }
 
-const getCitiesById = (id) => {
-  // ✅ CORRECTION: v3/cities/${id} était mal formaté
-  return callerService.Axios.get(`${callerService.API_URL}v3/cities/${id}`)
+const getCitiesById = (id, params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}cities/${id}`, { params })
 }
 
 const updateCities = (id, data) => {
-  return callerService.Axios.put(`${callerService.API_URL}v3/cities/${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}cities/${id}`, data)
 }
 
 const deleteCities = (id) => {
-  return callerService.Axios.delete(`${callerService.API_URL}v3/cities/${id}`)
+  return callerService.Axios.delete(`${callerService.API_URL}cities/${id}`)
 }
 
 export const PaysVilleService = {
@@ -77,7 +67,7 @@ export const PaysVilleService = {
   updatePays,
   deletePays,
 
-  // Cities
+  // Villes
   addCities,
   importCitiesCsv,
   getCitiesList,

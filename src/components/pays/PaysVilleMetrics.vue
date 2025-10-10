@@ -190,7 +190,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted,ref } from 'vue'
 import { usePaysVille } from '@/composables/pays_ville/usePaysVille'
 
 const { paysList, citiesList, fetchPaysList, fetchCitiesList } = usePaysVille()
@@ -200,6 +200,9 @@ const paysCount = computed(() => paysList.value.length)
 
 // Nombre de villes
 const villesCount = computed(() => citiesList.value.length)
+
+const showDeleted = ref(false)
+
 
 // Moyenne de villes par pays
 const averageCoverage = computed(() => {
@@ -219,10 +222,10 @@ const coveragePercentage = computed(() => {
 onMounted(() => {
   // Charger les données si elles ne sont pas déjà chargées
   if (paysList.value.length === 0) {
-    fetchPaysList()
+    fetchPaysList(showDeleted.value)
   }
   if (citiesList.value.length === 0) {
-    fetchCitiesList()
+    fetchCitiesList(showDeleted.value)
   }
 })
 </script>

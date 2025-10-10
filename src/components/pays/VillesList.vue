@@ -110,6 +110,7 @@ const { isLoading, error, citiesList, paysList, fetchCitiesList, fetchPaysList, 
 
 const showEditModal = ref(false)
 const editingVille = ref(null)
+const showDeleted = ref(false)
 
 const filteredCitiesList = computed(() => {
   if (!props.searchQuery) return citiesList.value
@@ -129,10 +130,10 @@ const getPaysName = (paysId) => {
 
 onMounted(() => {
   if (citiesList.value.length === 0) {
-    fetchCitiesList()
+    fetchCitiesList(showDeleted.value)
   }
   if (paysList.value.length === 0) {
-    fetchPaysList()
+    fetchPaysList(showDeleted.value)
   }
 })
 

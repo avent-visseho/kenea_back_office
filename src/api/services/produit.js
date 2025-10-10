@@ -1,66 +1,48 @@
-// src/api/services/produit.js
+//src/api/services/produit.js
 import { callerService } from './caller_service'
 
-// ============= PRODUITS =============
-
-// Créer un produit
+// ======== PRODUITS ========
 const addProduit = (data) => {
-  return callerService.Axios.post(`api/v1/produits`, data)
+  return callerService.Axios.post(`${callerService.API_URL}produits`, data)
 }
 
-// Récupérer tous les produits
-const getProduitsList = () => {
-  return callerService.Axios.get(`api/v1/produits`)
+const getProduitsList = (params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}produits`, { params })
 }
 
-// Récupérer un produit par ID
-const getProduitById = (id) => {
-  return callerService.Axios.get(`api/v1/produits/${id}`)
+const getProduitById = (id, params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}produits/${id}`, { params })
 }
 
-// Modifier un produit
 const updateProduit = (id, data) => {
-  return callerService.Axios.put(`api/v1/produits/${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}produits/${id}`, data)
 }
 
-// Supprimer un produit
 const deleteProduit = (id) => {
-  return callerService.Axios.delete(`api/v1/produits/${id}`)
+  return callerService.Axios.delete(`${callerService.API_URL}produits/${id}`)
 }
 
-// Rechercher des produits par nom et pharmacie
 const searchProduits = (params) => {
-  const { nom, pharmacieId } = params
-  return callerService.Axios.get(
-    `api/v1/produits/search?nom=${nom}&pharmacieId=${pharmacieId}`
-  )
+  return callerService.Axios.get(`${callerService.API_URL}produits/search`, { params })
 }
 
-// Suggestions de produits basées sur la localisation
 const suggestProduits = (params) => {
-  const { clientLat, clientLon, nomProduit } = params
-  return callerService.Axios.get(
-    `api/v1/produits/suggest?clientLat=${clientLat}&clientLon=${clientLon}&nomProduit=${nomProduit}`
-  )
+  return callerService.Axios.get(`${callerService.API_URL}produits/suggest`, { params })
 }
 
-// Rechercher une liste de produits pour une pharmacie
 const searchProduitsList = (pharmacieId, produitNames) => {
   return callerService.Axios.post(
-    `api/v1/produits/search/list/${pharmacieId}`,
+    `${callerService.API_URL}produits/search/list/${pharmacieId}`,
     produitNames
   )
 }
 
-// Import CSV avec pharmacieId et categorieId
 const importProduitsCsv = (formData, pharmacieId, categorieId) => {
   return callerService.Axios.post(
-    `api/v1/produits/import/${pharmacieId}/${categorieId}`,
+    `${callerService.API_URL}produits/import/${pharmacieId}/${categorieId}`,
     formData,
     {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
+      headers: { 'Content-Type': 'multipart/form-data' },
     }
   )
 }

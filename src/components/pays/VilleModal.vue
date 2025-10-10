@@ -99,6 +99,8 @@ const { createCities, updateCities, paysList, fetchPaysList } = usePaysVille()
 const isOpen = ref(true)
 const isSubmitting = ref(false)
 const errorMessage = ref('')
+const showDeleted = ref(false)
+
 
 const isEditMode = computed(() => !!props.villeData)
 
@@ -109,7 +111,7 @@ const formData = ref({
 
 onMounted(() => {
   if (paysList.value.length === 0) {
-    fetchPaysList()
+    fetchPaysList(showDeleted.value)
   }
 })
 

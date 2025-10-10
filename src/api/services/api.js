@@ -3,7 +3,7 @@ import { callerService } from './caller_service'
 
 const API_HOST = callerService.API_HOST_SERVEUR
 
-export const API_URL = API_HOST + '/kenea/api'
+export const API_URL = API_HOST + '/kenea/api/'
 
 const deleteResource = (resourcePath) => {
   return callerService.Axios.delete(resourcePath)

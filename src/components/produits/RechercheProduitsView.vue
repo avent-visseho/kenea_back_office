@@ -234,6 +234,8 @@ const hasSearched = ref(false)
 const searchResults = ref([])
 const userLocation = ref(null)
 const isGettingLocation = ref(false)
+const showDeleted = ref(false)
+
 
 const formatPrice = (price) => {
   if (!price) return '0'
@@ -312,7 +314,7 @@ const handleSearch = async () => {
 
 onMounted(async () => {
   if (pharmaciesList.value.length === 0) {
-    await fetchPharmaciesList()
+    await fetchPharmaciesList(showDeleted.value)
   }
 })
 </script>

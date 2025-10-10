@@ -163,6 +163,7 @@ const { citiesList, fetchCitiesList } = usePaysVille()
 
 const error = ref(null)
 const isEditMode = computed(() => !!props.pharmacieData)
+const showDeleted = ref(false)
 
 const form = ref({
   name: '',
@@ -207,7 +208,7 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   if (citiesList.value.length === 0) {
-    await fetchCitiesList()
+    await fetchCitiesList(showDeleted.value)
   }
 
   if (isEditMode.value && props.pharmacieData) {

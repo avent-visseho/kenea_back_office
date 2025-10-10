@@ -190,13 +190,16 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted,ref } from 'vue'
 import { useProduitsCategorie } from '@/composables/pharmacie/useCategories'
 
 const { categoriesList, fetchCategories } = useProduitsCategorie()
 
 // Nombre total de catégories
 const totalCategories = computed(() => categoriesList.value.length)
+
+const showDeleted = ref(false)
+
 
 // Catégories ajoutées ce mois
 const categoriesThisMonth = computed(() => {
@@ -232,7 +235,7 @@ const completionRate = computed(() => {
 onMounted(async () => {
   // Charger les données si elles ne sont pas déjà chargées
   if (categoriesList.value.length === 0) {
-    await fetchCategories()
+    await fetchCategories(showDeleted.value)
   }
 })
 </script>

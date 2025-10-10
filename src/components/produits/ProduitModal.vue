@@ -129,6 +129,8 @@ const emit = defineEmits(['close', 'success'])
 const { createProduit, updateProduit } = useProduits()
 const { pharmaciesList, fetchPharmaciesList } = usePharmaciesVille()
 const { categoriesList, fetchCategories } = useProduitsCategorie()
+const showDeleted = ref(false)
+
 
 const isEditMode = computed(() => !!props.produitData)
 const isSubmitting = ref(false)
@@ -211,11 +213,11 @@ onMounted(async () => {
   initForm()
   
   if (pharmaciesList.value.length === 0) {
-    await fetchPharmaciesList()
+    await fetchPharmaciesList(showDeleted.value)
   }
   
   if (categoriesList.value.length === 0) {
-    await fetchCategories()
+    await fetchCategories(showDeleted.value)
   }
 })
 </script>
