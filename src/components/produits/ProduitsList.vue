@@ -5,7 +5,7 @@
     <div class="flex flex-col gap-4 mb-4">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Gestion des Produits{{ produitsList }}
+          Gestion des Produits<!-- {{ produitsList }} -->
         </h3>
 
         <div class="flex items-center gap-3">

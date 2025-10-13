@@ -17,7 +17,7 @@ const updateCategorie = (id, data) => {
 }
 
 const deleteCategorie = (id) => {
-  return callerService.Axios.delete(`${callerService.API_URL}categories/${id}`)
+  return callerService.Axios.patch(`${callerService.API_URL}categories/${id}`)
 }
 
 const importCategoriesCsv = (formData) => {

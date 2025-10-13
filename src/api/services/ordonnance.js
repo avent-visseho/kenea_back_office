@@ -2,30 +2,15 @@
 import { callerService } from './caller_service'
 
 const getAllOrdonnances = (params = {}) => {
-  return callerService.Axios.get(`${callerService.API_URL}ordonnances`, { params })
+  return callerService.Axios.get(`${callerService.API_URL}ordonnances/all`, { params })
 }
 
 const getOrdonnanceById = (id, params = {}) => {
-  return callerService.Axios.get(`${callerService.API_URL}ordonnances/${id}`, { params })
+  return callerService.Axios.get(`${callerService.API_URL}ordonnances/read/${id}`, { params })
 }
 
-const getOrdonnancesByUtilisateur = (utilisateurId, params = {}) => {
-  return callerService.Axios.get(`${callerService.API_URL}ordonnances/utilisateur/${utilisateurId}`, { params })
-}
 
-const getAllOrdonnancesByUtilisateur = (utilisateurId, params = {}) => {
-  return callerService.Axios.get(`${callerService.API_URL}ordonnances/utilisateur/ordonnance/${utilisateurId}`, { params })
-}
-
-const getOrdonnancesByPharmacie = (pharmacieId, params = {}) => {
-  return callerService.Axios.get(`${callerService.API_URL}ordonnances/pharmacie/${pharmacieId}`, { params })
-}
-
-const getAllOrdonnancesByPharmacie = (pharmacieId, params = {}) => {
-  return callerService.Axios.get(`${callerService.API_URL}ordonnances/pharmacie/ordonnance/${pharmacieId}`, { params })
-}
-
-const uploadOrdonnance = (pharmacieId, file) => {
+/* const uploadOrdonnance = (pharmacieId, file) => {
   const formData = new FormData()
   formData.append('file', file)
   
@@ -35,24 +20,46 @@ const uploadOrdonnance = (pharmacieId, file) => {
       'Content-Type': 'multipart/form-data'
     }
   })
-}
+} */
+
+  // src/api/ordonnance.js
+
+const uploadOrdonnance = (pharmacieId, file) => {
+  const formData = new FormData();
+
+  // Le backend attend un champ 'dto' en JSON string
+  const dto = { pharmacieId };
+  formData.append('dto', JSON.stringify(dto));
+
+  // Ajout du fichier
+  formData.append('file', file);
+
+  // Envoi vers l’API
+  return callerService.Axios.post(
+    `${callerService.API_URL}ordonnances/upload`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        // Si ton callerService n’ajoute pas automatiquement le token :
+        // 'Authorization': `Bearer ${store.token}`,
+      },
+    }
+  );
+};
+
+export { uploadOrdonnance };
+
 
 const deleteOrdonnance = (id) => {
-  return callerService.Axios.patch(`${callerService.API_URL}ordonnances/${id}/delete`)
+  return callerService.Axios.delete(`${callerService.API_URL}ordonnances/delete/${id}`)
 }
 
-const updateOrdonnanceStatus = (id, etat) => {
-  return callerService.Axios.patch(`${callerService.API_URL}ordonnances/${id}/status`, { etat })
-}
+
 
 export const OrdonnanceServices = {
   getAllOrdonnances,
   getOrdonnanceById,
-  getOrdonnancesByUtilisateur,
-  getAllOrdonnancesByUtilisateur,
-  getOrdonnancesByPharmacie,
-  getAllOrdonnancesByPharmacie,
   uploadOrdonnance,
   deleteOrdonnance,
-  updateOrdonnanceStatus
 }

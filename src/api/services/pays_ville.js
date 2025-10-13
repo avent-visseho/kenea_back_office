@@ -12,7 +12,7 @@ const importPaysCsv = (formData) => {
 }
 
 const getPaysList = (params = {}) => {
-  return callerService.Axios.get(`${callerService.API_URL}pays/all/all`, { params })
+  return callerService.Axios.get(`${callerService.API_URL}pays/all`, { params })
 }
 
 const getPaysById = (id, params = {}) => {
@@ -20,7 +20,7 @@ const getPaysById = (id, params = {}) => {
 }
 
 const updatePays = (id, data) => {
-  return callerService.Axios.put(`${callerService.API_URL}pays/update/${id}?id=${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}pays/update/${id}`, data) //?id=${id}
 }
 
 const deletePays = (id) => {
@@ -51,7 +51,7 @@ const getCitiesById = (id, params = {}) => {
 }
 
 const updateCities = (id, data) => {
-  return callerService.Axios.put(`${callerService.API_URL}cities/${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}cities/pays/${id}`, data)
 }
 
 const deleteCities = (id) => {

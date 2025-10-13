@@ -58,6 +58,24 @@ const router = createRouter({
         requiresAuth: true,
         /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
       },
+    },{
+      path: '/roles',
+      name: 'roles',
+      component: () => import('../views/roles/RolesView.vue'),
+      meta: {
+        title: 'roles',
+        requiresAuth: true,
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+      },
+    },{
+      path: '/privileges',
+      name: 'privileges',
+      component: () => import('../views/privileges/PrivilegesView.vue'),
+      meta: {
+        title: 'privileges',
+        requiresAuth: true,
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+      },
     },
     {
       path: '/groupe',

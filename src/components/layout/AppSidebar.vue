@@ -185,12 +185,14 @@ const menuGroups = [
           { name: 'categorie', path: '/categorie' },
           { name: 'produits', path: '/produits' },
           { name: 'users', path: '/users' },
+          { name: 'roles', path: '/roles' },
+          { name: 'privileges', path: '/privileges' },
         ],
       },
        {
         icon: CalenderIcon,
-        name: 'ordonnaces',
-        path: '/ordonnaces',
+        name: 'ordonnance',
+        path: '/ordonnance',
       },
       /* {
         icon: CalenderIcon,

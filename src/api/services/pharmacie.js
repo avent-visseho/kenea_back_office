@@ -38,7 +38,7 @@ const updatePharmacies = (uuid, data) => {
 }
 
 const deletePharmacies = (uuid) => {
-  return callerService.Axios.delete(`${callerService.API_URL}pharmacies/${uuid}`)
+  return callerService.Axios.delete(`${callerService.API_URL}pharmacies/${uuid}`) // a revoir 
 }
 
 export const PharmaciesService = {

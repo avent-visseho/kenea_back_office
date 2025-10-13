@@ -47,7 +47,7 @@
               class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
               <option value="">Sélectionnez une pharmacie</option>
-              <option v-for="pharmacie in pharmacies" :key="pharmacie.id" :value="pharmacie.id">
+              <option v-for="pharmacie in pharmaciesList" :key="pharmacie.id" :value="pharmacie.id">
                 {{ pharmacie.nom || pharmacie.name }}
               </option>
             </select>
@@ -192,12 +192,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
 import { useOrdonnances } from '@/composables/ordannance/useOrdonnances.js'
+import { usePharmaciesVille } from '@/composables/pharmacie/usePharmacies'
+
+const showDeleted = ref(false)
+
 
 const emit = defineEmits(['close', 'success'])
 
 const { uploadOrdonnance, isLoading } = useOrdonnances()
+const { 
+  pharmaciesList, 
+  fetchPharmaciesList, 
+} = usePharmaciesVille()
 
 const form = ref({
   pharmacieId: ''
@@ -208,11 +216,6 @@ const isDragging = ref(false)
 const error = ref(null)
 const fileInput = ref(null)
 
-// Mock data - À remplacer par vos vraies données
-const pharmacies = ref([
-  { id: 'PHA-1759831495814-445', nom: 'Pharmacie Centrale' },
-  { id: 'PHA-1759831495814-572', nom: 'Pharmacie du Quartier' }
-])
 
 const handleFileSelect = (event) => {
   const file = event.target.files[0]
@@ -280,4 +283,10 @@ const handleSubmit = async () => {
     error.value = result.error || 'Erreur lors de l\'upload'
   }
 }
+
+onMounted(async () => {
+  if (pharmaciesList.value.length === 0) {
+    await fetchPharmaciesList(showDeleted.value)
+  }
+})
 </script>
