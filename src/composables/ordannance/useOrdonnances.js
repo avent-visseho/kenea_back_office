@@ -8,12 +8,12 @@ const isLoading = ref(false)
 const error = ref(null)
 
 export function useOrdonnances() {
-  const fetchAllOrdonnances = async (deleted = false) => {
+  const fetchAllOrdonnances = async () => { //deleted = false
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await OrdonnanceServices.getAllOrdonnances({ deleted })
+      const response = await OrdonnanceServices.getAllOrdonnances() //{ deleted }
 
       if (Array.isArray(response.data)) {
         ordonnancesList.value = response.data
@@ -146,18 +146,23 @@ export function useOrdonnances() {
     }
   }
 
-  const uploadOrdonnance = async (pharmacieId, file) => {
+  const uploadOrdonnance = async (pharmacieIds, file) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await OrdonnanceServices.uploadOrdonnance(pharmacieId, file)
+      const response = await OrdonnanceServices.uploadOrdonnance(pharmacieIds, file)
 
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 201) {
         const newOrdonnance = response.data.body || response.data
 
         if (newOrdonnance && typeof newOrdonnance === 'object') {
-          ordonnancesList.value.unshift(newOrdonnance)
+          // Si c'est un tableau (plusieurs ordonnances créées)
+          if (Array.isArray(newOrdonnance)) {
+            ordonnancesList.value.unshift(...newOrdonnance)
+          } else {
+            ordonnancesList.value.unshift(newOrdonnance)
+          }
         }
 
         return { success: true, data: newOrdonnance }
@@ -173,6 +178,29 @@ export function useOrdonnances() {
       isLoading.value = false
     }
   }
+
+  const fetchOrdonnancesByEtat = async (etat) => {
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const response = await OrdonnanceServices.getByEtat(etat)
+
+    if (Array.isArray(response.data)) {
+      ordonnancesList.value = response.data
+    } else if (response.data.body && Array.isArray(response.data.body)) {
+      ordonnancesList.value = response.data.body
+    }
+
+    return { success: true, data: ordonnancesList.value }
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Erreur lors du chargement des ordonnances'
+    console.error('❌ Erreur fetchOrdonnancesByEtat:', err)
+    return { success: false, error: error.value }
+  } finally {
+    isLoading.value = false
+  }
+}
 
   const deleteOrdonnance = async (id) => {
     isLoading.value = true
@@ -236,6 +264,7 @@ export function useOrdonnances() {
     fetchAllOrdonnancesByUtilisateur,
     fetchOrdonnancesByPharmacie,
     fetchAllOrdonnancesByPharmacie,
+    fetchOrdonnancesByEtat,
     uploadOrdonnance,
     deleteOrdonnance,
     updateStatus

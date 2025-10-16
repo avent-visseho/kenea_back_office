@@ -63,12 +63,12 @@
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Prix</p>
             </th>
-            <th class="py-3 text-left">
+            <!-- <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Pharmacie</p>
             </th>
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Catégorie</p>
-            </th>
+            </th> -->
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Code barre</p>
             </th>
@@ -119,18 +119,18 @@
             </td>
 
             <!-- Pharmacie -->
-            <td class="py-3 whitespace-nowrap">
+            <!-- <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">
                 {{ produit.pharmacieName || 'N/A' }}
               </p>
-            </td>
+            </td> -->
 
             <!-- Catégorie -->
-            <td class="py-3 whitespace-nowrap">
+            <!-- <td class="py-3 whitespace-nowrap">
               <span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-theme-xs font-medium text-blue-600 dark:bg-blue-500/15 dark:text-blue-500">
                 {{ produit.categorieName || 'N/A' }}
               </span>
-            </td>
+            </td> -->
 
             <!-- Code barre -->
             <td class="py-3 whitespace-nowrap">

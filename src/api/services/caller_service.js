@@ -2,7 +2,6 @@
 import axios from 'axios'
 import router from '@/router'
 
-// ✅ CORRECTION: Utilisation de import.meta.env au lieu de VITE_API_BASE_URL directement
 const API_HOST_SERVEUR = import.meta.env.VITE_API_BASE_URL
 const API_URL = `${API_HOST_SERVEUR.replace(/\/$/, '')}/kenea/api/v3/`
 
@@ -45,7 +44,7 @@ Axios.interceptors.request.use((request) => {
   return request
 })
 
-// Intercepteur de réponse - gérer les erreurs d'authentification
+// ✅ INTERCEPTEUR CORRIGÉ - Ne déconnecte plus automatiquement
 Axios.interceptors.response.use(
   (response) => {
     return response
@@ -53,15 +52,25 @@ Axios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    // Si erreur 401 et que ce n'est pas déjà une tentative de refresh
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+    // ✅ Si erreur 401, juste notifier sans déconnecter
+    if (error.response?.status === 401) {
+      console.error('❌ Erreur 401 - Non autorisé:', {
+        url: originalRequest?.url,
+        method: originalRequest?.method,
+      })
 
-      // Nettoyer l'authentification et rediriger vers login
-      localStorage.removeItem('auth_data')
-      router.push('/login')
+      // ✅ Afficher une alerte au lieu de déconnecter
+      if (window.alert) {
+        alert(`⚠️ Erreur d'autorisation (401)\n\nVous n'avez pas les permissions nécessaires pour cette action.\n\nURL: ${originalRequest?.url}`)
+      }
+
+      // ✅ Option alternative : Utiliser un toast/notification si vous avez une lib
+      // Si vous utilisez une bibliothèque de notification (comme vue-toastification),
+      // décommentez et adaptez cette ligne :
+      // toast.error('Erreur d\'autorisation. Vérifiez vos permissions.', { duration: 5000 })
     }
 
+    // ✅ Rejeter l'erreur pour que le composant puisse la gérer
     return Promise.reject(error)
   },
 )
@@ -73,7 +82,6 @@ const getToken = () => {
     try {
       const parsed = JSON.parse(authData)
       if (parsed.tokens?.access_token && parsed.tokens?.token_type) {
-        // ✅ CORRECTION: Utilisation correcte des backticks
         return `${parsed.tokens.token_type} ${parsed.tokens.access_token}`
       }
     } catch (error) {

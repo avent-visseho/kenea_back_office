@@ -57,7 +57,7 @@
         </div>
 
         <!-- Pharmacie -->
-        <div>
+        <!-- <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Pharmacie <span class="text-red-500">*</span>
           </label>
@@ -70,10 +70,10 @@
             </option>
           </select>
           <p v-if="errors.pharmacieId" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.pharmacieId }}</p>
-        </div>
+        </div> -->
 
         <!-- Catégorie -->
-        <div>
+        <!-- <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Catégorie <span class="text-red-500">*</span>
           </label>
@@ -86,7 +86,7 @@
             </option>
           </select>
           <p v-if="errors.categorieId" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errors.categorieId }}</p>
-        </div>
+        </div> -->
       </div>
 
       <!-- Footer -->
@@ -114,8 +114,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useProduits } from '@/composables/pharmacie/useProduits'
-import { usePharmaciesVille } from '@/composables/pharmacie/usePharmacies'
-import { useProduitsCategorie } from '@/composables/pharmacie/useCategories'
+/* import { usePharmaciesVille } from '@/composables/pharmacie/usePharmacies'
+import { useProduitsCategorie } from '@/composables/pharmacie/useCategories' */
 
 const props = defineProps({
   produitData: {
@@ -127,9 +127,9 @@ const props = defineProps({
 const emit = defineEmits(['close', 'success'])
 
 const { createProduit, updateProduit } = useProduits()
-const { pharmaciesList, fetchPharmaciesList } = usePharmaciesVille()
-const { categoriesList, fetchCategories } = useProduitsCategorie()
-const showDeleted = ref(false)
+/* const { pharmaciesList, fetchPharmaciesList } = usePharmaciesVille()
+const { categoriesList, fetchCategories } = useProduitsCategorie() 
+const showDeleted = ref(false)*/
 
 
 const isEditMode = computed(() => !!props.produitData)
@@ -139,9 +139,9 @@ const errors = ref({})
 const formData = ref({
   nom: '',
   prix: null,
-  description: '',
-  pharmacieId: '',
-  categorieId: ''
+  description: ''
+/*   pharmacieId: '',
+  categorieId: '' */
 })
 
 const initForm = () => {
@@ -149,9 +149,9 @@ const initForm = () => {
     formData.value = {
       nom: props.produitData.nom || '',
       prix: props.produitData.prix || null,
-      description: props.produitData.description || '',
-      pharmacieId: props.produitData.pharmacieNameId || props.produitData.pharmacieId || '',
-      categorieId: props.produitData.categorieId || ''
+      description: props.produitData.description || ''
+/*       pharmacieId: props.produitData.pharmacieNameId || props.produitData.pharmacieId || '',
+      categorieId: props.produitData.categorieId || '' */
     }
   }
 }
@@ -170,14 +170,14 @@ const validateForm = () => {
   if (!formData.value.description?.trim()) {
     errors.value.description = 'La description est requise'
   }
-
+/* 
   if (!formData.value.pharmacieId) {
     errors.value.pharmacieId = 'La pharmacie est requise'
   }
 
   if (!formData.value.categorieId) {
     errors.value.categorieId = 'La catégorie est requise'
-  }
+  } */
 
   return Object.keys(errors.value).length === 0
 }
@@ -212,12 +212,12 @@ const handleSubmit = async () => {
 onMounted(async () => {
   initForm()
   
-  if (pharmaciesList.value.length === 0) {
+/*   if (pharmaciesList.value.length === 0) {
     await fetchPharmaciesList(showDeleted.value)
   }
   
   if (categoriesList.value.length === 0) {
     await fetchCategories(showDeleted.value)
-  }
+  } */
 })
 </script>

@@ -86,6 +86,15 @@ const router = createRouter({
         requiresAuth: true,
         allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
+    },{
+      path: '/inbox',
+      name: 'inbox',
+      component: () => import('../views/inbox/InboxView.vue'),
+      meta: {
+        title: 'Groupe',
+        requiresAuth: true,
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
+      },
     },
     {
       path: '/pays',
@@ -113,6 +122,15 @@ const router = createRouter({
       component: () => import('../views/ordonnance/OrdonnancesView.vue'),
       meta: {
         title: 'Ordonnance',
+        requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+      },
+    },{
+      path: '/ordonnance-progression',
+      name: 'ordonnance-progression',
+      component: () => import('../views/ordonnance/OrdonnanceProgressionsView.vue'),
+      meta: {
+        title: 'Ordonnance Progression',
         requiresAuth: true,
         allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },

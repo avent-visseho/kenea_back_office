@@ -1,0 +1,346 @@
+<template>
+  <div class="flex h-[calc(100vh-180px)] gap-4">
+    <!-- Sidebar Filters -->
+    <div class="w-64 flex-shrink-0 rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-lg overflow-y-auto">
+      <div class="space-y-3">
+        <button @click="activeFilter = 'all'"
+          :class="[
+            'w-full px-4 py-3 rounded-xl text-left font-medium transition-all duration-200',
+            activeFilter === 'all'
+              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-600/30'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+          ]">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <div>
+              <div>Boîte de réception</div>
+              <div class="text-xs font-normal opacity-75">{{ stats.total }}</div>
+            </div>
+          </div>
+        </button>
+
+        <button @click="activeFilter = 'pending'"
+          :class="[
+            'w-full px-4 py-3 rounded-xl text-left font-medium transition-all duration-200',
+            activeFilter === 'pending'
+              ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-lg shadow-amber-600/30'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+          ]">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <div>En attente</div>
+              <div class="text-xs font-normal opacity-75">{{ stats.pending }}</div>
+            </div>
+          </div>
+        </button>
+
+        <button @click="activeFilter = 'resolved'"
+          :class="[
+            'w-full px-4 py-3 rounded-xl text-left font-medium transition-all duration-200',
+            activeFilter === 'resolved'
+              ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-lg shadow-emerald-600/30'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+          ]">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <div>Résolu</div>
+              <div class="text-xs font-normal opacity-75">{{ stats.resolved }}</div>
+            </div>
+          </div>
+        </button>
+
+        <button @click="activeFilter = 'today'"
+          :class="[
+            'w-full px-4 py-3 rounded-xl text-left font-medium transition-all duration-200',
+            activeFilter === 'today'
+              ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-600/30'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+          ]">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 5a2 2 0 012-2h6a2 2 0 012 2v2H6V5zm0 4h12v9a2 2 0 01-2 2H8a2 2 0 01-2-2V9z" />
+            </svg>
+            <div>
+              <div>Aujourd'hui</div>
+              <div class="text-xs font-normal opacity-75">{{ stats.today }}</div>
+            </div>
+          </div>
+        </button>
+
+        <div class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+          <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-4 mb-2">PHARMACIES</div>
+          <div class="space-y-1 max-h-64 overflow-y-auto">
+            <button v-for="pharma in uniquePharmacies" :key="pharma"
+              @click="selectedPharmacie = pharma; activeFilter = 'pharmacie'"
+              :class="[
+                'w-full px-4 py-2 rounded-lg text-left text-sm transition-all duration-200',
+                activeFilter === 'pharmacie' && selectedPharmacie === pharma
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              ]">
+              {{ pharma }}
+            </button>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+          <input v-model="searchQuery" type="text" placeholder="Rechercher..."
+            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <!-- Header -->
+      <div class="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-lg mb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Boîte de réception</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {{ filteredInbox.length }} message{{ filteredInbox.length !== 1 ? 's' : '' }}
+            </p>
+          </div>
+          <button @click="refreshInbox"
+            class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 text-sm font-semibold text-white hover:shadow-lg hover:shadow-blue-600/30 transition-all duration-300">
+            <svg class="w-4 h-4" :class="{ 'animate-spin': isLoading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Rafraîchir
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+        <div v-if="isLoading" class="flex justify-center items-center py-12">
+          <div class="space-y-4 w-full">
+            <div v-for="i in 3" :key="i" class="h-24 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-2xl animate-pulse"></div>
+          </div>
+        </div>
+
+        <div v-else-if="filteredInbox.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+          <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
+            <svg class="h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <p class="text-gray-500 dark:text-gray-400 font-medium">Aucun message</p>
+          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Votre boîte de réception est vide</p>
+        </div>
+
+        <div v-else v-for="message in filteredInbox" :key="message.id"
+          @click="selectedMessage = message"
+          :class="[
+            'group rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden hover:shadow-lg hover:scale-[1.01]',
+            selectedMessage?.id === message.id
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg'
+              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600'
+          ]">
+          <div class="p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <div :class="[
+                    'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
+                    message.statut === 'PENDING'
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                      : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                  ]">
+                    <span class="h-2 w-2 rounded-full" :class="message.statut === 'PENDING' ? 'bg-amber-500' : 'bg-emerald-500'"></span>
+                    {{ message.statut === 'PENDING' ? 'En attente' : 'Résolu' }}
+                  </div>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ message.code }}</span>
+                </div>
+
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                  {{ message.pharmacieNom }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  De: {{ message.clientNom }}
+                </p>
+              </div>
+
+              <div class="ml-4 flex-shrink-0 text-right">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                  {{ message.total || 'N/A' }}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {{ formatTime(message.dateEnvoi) }}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {{ formatDate(message.dateEnvoi) }}
+              <span v-if="message.dateReponse" class="ml-auto text-emerald-600 dark:text-emerald-400">
+                ✓ Répondu le {{ formatDate(message.dateReponse) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div v-if="selectedMessage" class="w-96 flex-shrink-0 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-lg overflow-y-auto">
+      <button @click="selectedMessage = null"
+        class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Détails</h3>
+
+      <div class="space-y-4">
+        <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
+          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Pharmacie</p>
+          <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedMessage.pharmacieNom }}</p>
+        </div>
+
+        <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
+          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Client</p>
+          <p class="text-sm text-gray-900 dark:text-white break-all">{{ selectedMessage.clientNom }}</p>
+        </div>
+
+        <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
+          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Code Ordonnance</p>
+          <p class="text-sm font-mono text-gray-900 dark:text-white">{{ selectedMessage.code }}</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Statut</p>
+            <span :class="[
+              'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium',
+              selectedMessage.statut === 'PENDING'
+                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+            ]">
+              <span class="h-2 w-2 rounded-full" :class="selectedMessage.statut === 'PENDING' ? 'bg-amber-500' : 'bg-emerald-500'"></span>
+              {{ selectedMessage.statut }}
+            </span>
+          </div>
+
+          <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Total</p>
+            <p class="text-lg font-bold text-gray-900 dark:text-white">{{ selectedMessage.total || '--' }}</p>
+          </div>
+        </div>
+
+        <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
+          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Date d'envoi</p>
+          <p class="text-sm text-gray-900 dark:text-white">{{ formatDateTime(selectedMessage.dateEnvoi) }}</p>
+        </div>
+
+        <div v-if="selectedMessage.dateReponse" class="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 p-4 border border-emerald-200 dark:border-emerald-900/30">
+          <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-2">Date de réponse</p>
+          <p class="text-sm text-emerald-900 dark:text-emerald-300">{{ formatDateTime(selectedMessage.dateReponse) }}</p>
+        </div>
+
+        <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+          <button
+            class="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2.5 text-sm font-medium text-white hover:shadow-lg hover:shadow-blue-600/30 transition-all">
+            Voir l'ordonnance
+          </button>
+          <button
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            Répondre
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useInbox } from '@/composables/inbox/useInbox'
+
+const { inboxList, isLoading, stats, fetchInboxGlobal } = useInbox()
+
+const activeFilter = ref('all')
+const selectedPharmacie = ref(null)
+const selectedMessage = ref(null)
+const searchQuery = ref('')
+
+const uniquePharmacies = computed(() => {
+  return [...new Set(inboxList.value.map(m => m.pharmacieNom))]
+})
+
+const filteredInbox = computed(() => {
+  let filtered = inboxList.value
+
+  // Filter by active filter
+  if (activeFilter.value === 'pending') {
+    filtered = filtered.filter(m => m.statut === 'PENDING')
+  } else if (activeFilter.value === 'resolved') {
+    filtered = filtered.filter(m => m.statut !== 'PENDING')
+  } else if (activeFilter.value === 'today') {
+    const today = new Date()
+    filtered = filtered.filter(m => {
+      const date = new Date(m.dateEnvoi)
+      return date.toDateString() === today.toDateString()
+    })
+  } else if (activeFilter.value === 'pharmacie' && selectedPharmacie.value) {
+    filtered = filtered.filter(m => m.pharmacieNom === selectedPharmacie.value)
+  }
+
+  // Filter by search
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(m =>
+      m.code.toLowerCase().includes(query) ||
+      m.pharmacieNom.toLowerCase().includes(query) ||
+      m.clientNom.toLowerCase().includes(query)
+    )
+  }
+
+  return filtered.sort((a, b) => new Date(b.dateEnvoi) - new Date(a.dateEnvoi))
+})
+
+const formatDate = (date) => {
+  if (!date) return 'N/A'
+  const d = new Date(date)
+  return d.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' })
+}
+
+const formatTime = (date) => {
+  if (!date) return 'N/A'
+  const d = new Date(date)
+  return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+}
+
+const formatDateTime = (date) => {
+  if (!date) return 'N/A'
+  const d = new Date(date)
+  return d.toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const refreshInbox = async () => {
+  await fetchInboxGlobal()
+}
+
+onMounted(async () => {
+  await fetchInboxGlobal()
+})
+</script>

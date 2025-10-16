@@ -20,7 +20,7 @@ const getPaysById = (id, params = {}) => {
 }
 
 const updatePays = (id, data) => {
-  return callerService.Axios.put(`${callerService.API_URL}pays/update/${id}`, data) //?id=${id}
+  return callerService.Axios.put(`${callerService.API_URL}pays/update/${id}?id=${id}`, data) //?id=${id}
 }
 
 const deletePays = (id) => {
@@ -51,7 +51,7 @@ const getCitiesById = (id, params = {}) => {
 }
 
 const updateCities = (id, data) => {
-  return callerService.Axios.put(`${callerService.API_URL}cities/pays/${id}`, data)
+  return callerService.Axios.put(`${callerService.API_URL}cities/${id}`, data)
 }
 
 const deleteCities = (id) => {

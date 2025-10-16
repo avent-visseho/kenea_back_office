@@ -193,7 +193,19 @@ const menuGroups = [
         icon: CalenderIcon,
         name: 'ordonnance',
         path: '/ordonnance',
-      },
+      },{
+        icon: CalenderIcon,
+        name: 'ordonnance-progression',
+        path: '/ordonnance-progression',
+      },{
+        icon: CalenderIcon,
+        name: 'groupe',
+        path: '/groupe',
+      },{
+        icon: CalenderIcon,
+        name: 'inbox',
+        path: '/inbox',
+      }
       /* {
         icon: CalenderIcon,
         name: 'Calendar',
