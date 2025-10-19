@@ -11,7 +11,7 @@
           <div>
             <p class="text-sm font-medium text-blue-600 dark:text-blue-400">Total Groupes</p>
             <h4 class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ totalGroupes }}</h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Groupes créés</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-6">Groupes créés</p>
           </div>
           <div
             class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
@@ -30,7 +30,7 @@
           <div>
             <p class="text-sm font-medium text-purple-600 dark:text-purple-400">Gestion</p>
             <h4 class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Groupes</h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">et sous-groupes</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-7">et sous-groupes</p>
           </div>
           <div
             class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30">
@@ -49,7 +49,7 @@
           <div>
             <p class="text-sm font-medium text-emerald-600 dark:text-emerald-400">Système</p>
             <h4 class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Actif</h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Prêt à l'emploi</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-7">Prêt à l'emploi</p>
           </div>
           <div
             class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30">

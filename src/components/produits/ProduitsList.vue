@@ -1,6 +1,7 @@
 <!-- src/components/produit/ProduitsList.vue -->
 <template>
-  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
+  <div
+    class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
     <!-- Header -->
     <div class="flex flex-col gap-4 mb-4">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -13,7 +14,8 @@
           <button @click="showImportModal = true"
             class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             Importer CSV
           </button>
@@ -22,7 +24,8 @@
           <button @click="handleExport"
             class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
             </svg>
             Exporter CSV
           </button>
@@ -43,7 +46,8 @@
         <div class="relative flex-1 max-w-md">
           <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
           <input v-model="searchQuery" type="text" placeholder="Rechercher un produit..."
@@ -61,6 +65,15 @@
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Produit</p>
             </th>
             <th class="py-3 text-left">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Forme</p>
+            </th>
+            <th class="py-3 text-left">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Catégorie</p>
+            </th>
+            <th class="py-3 text-left">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Sous Catégorie</p>
+            </th>
+            <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Prix</p>
             </th>
             <!-- <th class="py-3 text-left">
@@ -70,7 +83,7 @@
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Catégorie</p>
             </th> -->
             <th class="py-3 text-left">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Code barre</p>
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">reference</p>
             </th>
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
@@ -96,13 +109,15 @@
             <td class="py-3 whitespace-nowrap">
               <div class="flex items-center gap-3">
                 <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                  <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 </div>
                 <div>
                   <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {{ produit.nom }}
+                    {{ produit.dci }}
                   </p>
                   <p class="text-gray-500 text-theme-xs dark:text-gray-400 mt-0.5">
                     {{ produit.code }}
@@ -111,9 +126,47 @@
               </div>
             </td>
 
+            <td class="py-3 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                  <svg class="h-4 w-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {{ produit.forme || 'N/A'}}
+                  </p>
+                </div>
+              </div>
+            </td>
+
+            <td class="py-3 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <div>
+                  <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {{ produit.categorie || 'N/A' }}
+                  </p>
+                </div>
+              </div>
+            </td>
+
+            <td class="py-3 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <div>
+                  <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                    {{ produit.sousCategorie || 'N/A' }}
+                  </p>
+                </div>
+              </div>
+            </td>
+
             <!-- Prix -->
             <td class="py-3 whitespace-nowrap">
-              <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-theme-xs font-medium text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-500">
+              <span
+                class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-theme-xs font-medium text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-500">
                 {{ formatPrice(produit.prix) }} FCFA
               </span>
             </td>
@@ -135,7 +188,7 @@
             <!-- Code barre -->
             <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-xs dark:text-gray-400 font-mono">
-                {{ produit.codeBarre || 'N/A' }}
+                {{ produit.reference || 'N/A' }}
               </p>
             </td>
 
@@ -166,7 +219,8 @@
     </div>
 
     <!-- Modals -->
-    <ProduitModal v-if="showProduitModal" :produit-data="editingProduit" @close="closeProduitModal" @success="handleProduitSuccess" />
+    <ProduitModal v-if="showProduitModal" :produit-data="editingProduit" @close="closeProduitModal"
+      @success="handleProduitSuccess" />
 
     <ImportProduitsCsvModal v-if="showImportModal" :pharmacies-list="pharmaciesList" :categories-list="categoriesList"
       @close="showImportModal = false" @import="handleImportCsv" />
@@ -249,7 +303,7 @@ const handleDelete = async (produit) => {
 const handleImportCsv = async ({ pharmacieId, categorieId, file }) => {
   try {
     console.log('📤 Import produits:', { pharmacieId, categorieId, file: file.name })
-    
+
     const result = await importProduitsCsv(file, pharmacieId, categorieId)
 
     if (result.success) {

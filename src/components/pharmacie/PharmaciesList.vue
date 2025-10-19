@@ -83,13 +83,22 @@
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Nom</p>
             </th>
             <th class="py-3 text-left">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Région</p>
+            </th>
+            <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Ville</p>
             </th>
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Téléphone</p>
             </th>
             <th class="py-3 text-left">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Non Gérant(e)</p>
+            </th>
+            <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Statut</p>
+            </th>
+            <th class="py-3 text-left">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">De Garde</p>
             </th>
             <th class="py-3 text-left">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
@@ -129,7 +138,14 @@
             </td>
             <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                {{ getVilleName(pharmacie.ville_id || pharmacie.city_id) }}
+               
+                   {{ pharmacie.region || pharmacie.region || 'N/A' }}
+              </p>
+            </td>
+            <td class="py-3 whitespace-nowrap">
+              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
+               <!--  {{ getVilleName(pharmacie.ville || pharmacie.ville) }} -->
+                   {{ pharmacie.ville || pharmacie.ville || 'N/A' }}
               </p>
             </td>
             <td class="py-3 whitespace-nowrap">
@@ -138,6 +154,13 @@
               </p>
             </td>
             <td class="py-3 whitespace-nowrap">
+              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
+                   {{ pharmacie.nameGerant || pharmacie.nameGerant || 'N/A' }}
+                   {{ pharmacie.prenomGerant || pharmacie.prenomGerant || 'N/A' }}
+              </p>
+            </td>
+            
+            <td class="py-3 whitespace-nowrap">
               <span :class="[
                 'rounded-full px-2 py-0.5 text-theme-xs font-medium',
                 pharmacie.active || pharmacie.statut === 'actif'
@@ -145,6 +168,16 @@
                   : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
               ]">
                 {{ pharmacie.active || pharmacie.statut === 'actif' ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+            <td class="py-3 whitespace-nowrap">
+              <span :class="[
+                'rounded-full px-2 py-0.5 text-theme-xs font-medium',
+                pharmacie.active || pharmacie.deGarde === 'true'
+                  ? 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'
+                  : 'bg-red-500 text-white dark:bg-red-500 dark:white'
+              ]">
+                {{ pharmacie.active || pharmacie.deGarde === 'true' ? 'true' : 'false' }}
               </span>
             </td>
             <td class="py-3 whitespace-nowrap">

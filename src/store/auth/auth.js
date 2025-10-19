@@ -12,7 +12,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     token: null,
-    pendingUsername: null, // Stocke le username en attendant l'OTP
+    pendingUsername: null,
     isAuthenticated: false,
     isLoading: false,
     error: null,
@@ -23,9 +23,39 @@ export const useAuthStore = defineStore('auth', {
     bearerToken: (state) => {
       return state.token ? `Bearer ${state.token}` : null
     },
+
+    // ✅ Getter pour les rôles
+    userRoles: (state) => {
+      return state.user?.roles || []
+    },
+
+    // ✅ Getter pour les informations personnelles
+    userPerson: (state) => {
+      return state.user?.person || null
+    },
+
+    // ✅ Nom d'affichage
+    displayName: (state) => {
+      if (state.user?.person?.firstname && state.user?.person?.lastname) {
+        return `${state.user.person.firstname} ${state.user.person.lastname}`
+      }
+      if (state.user?.username) {
+        if (state.user.username.includes('@')) {
+          const name = state.user.username.split('@')[0]
+          return name.charAt(0).toUpperCase() + name.slice(1)
+        }
+        return state.user.username.charAt(0).toUpperCase() + state.user.username.slice(1)
+      }
+      return 'Utilisateur'
+    },
   },
 
   actions: {
+    // ✅ Vérifier si l'utilisateur a un rôle
+    hasRole(roleName) {
+      return this.userRoles.some((role) => role.name === roleName)
+    },
+
     // ✅ Étape 1: Connexion initiale
     async login(credentials) {
       this.isLoading = true
@@ -34,14 +64,10 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await login(credentials)
-
         console.log('Login response:', response)
 
-        // Vérifier le statut de la réponse
         if (response.status === 'SUCCESS') {
-          // Stocker le username pour l'étape OTP
           this.pendingUsername = credentials.username
-
           return {
             success: true,
             requiresOtp: true,
@@ -83,17 +109,11 @@ export const useAuthStore = defineStore('auth', {
         console.log('OTP verification response:', response)
 
         if (response.status === 'SUCCESS' && response.body?.token) {
-          // Sauvegarder le token
           this.token = response.body.token
           this.isAuthenticated = true
           this.pendingUsername = null
-
-          // Sauvegarder dans localStorage ou sessionStorage
           this.saveToStorage()
-
-          // Récupérer les infos utilisateur
           await this.fetchUserInfo()
-
           return { success: true }
         }
 
@@ -144,29 +164,24 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // ✅ Récupérer les infos utilisateur
+    // ✅ CORRECTION PRINCIPALE: Récupérer les infos utilisateur
     async fetchUserInfo() {
       if (!this.token) return
 
       try {
         const response = await getUserInfo()
-
         console.log('User info response:', response)
 
-        // ✅ CORRECTION: La réponse est directement {roles, expiration, username}
-        // Pas besoin de response.body ou response.data
-        if (response && response.username) {
-          this.user = response // ✅ Directement la réponse
-          console.log('User info saved to store:', this.user)
+        // ✅ CORRECTION: Les données sont dans response.body
+        if (response?.status === 'SUCCESS' && response.body) {
+          this.user = response.body
+          console.log('✅ User info saved to store:', this.user)
           this.saveToStorage()
         } else {
-          console.error('Invalid user info response:', response)
+          console.error('❌ Invalid user info response:', response)
         }
       } catch (error) {
-        console.error('Error fetching user info:', error)
-        /* if (error.response?.status === 401) {
-          this.logout() 
-        } */
+        console.error('❌ Error fetching user info:', error)
       }
     },
 
@@ -202,11 +217,9 @@ export const useAuthStore = defineStore('auth', {
 
       const storage = useLocalStorage ? localStorage : sessionStorage
       storage.setItem('auth_data', JSON.stringify(authData))
-
-      // Aussi sauvegarder le token séparément pour axios
       storage.setItem('auth_token', this.token)
 
-      console.log('Auth data saved to storage:', authData)
+      console.log('✅ Auth data saved to storage:', authData)
     },
 
     // ✅ Charger depuis le storage
@@ -216,18 +229,18 @@ export const useAuthStore = defineStore('auth', {
 
         if (authData) {
           const parsed = JSON.parse(authData)
-          console.log('Loaded from storage:', parsed)
+          console.log('✅ Loaded from storage:', parsed)
 
           if (parsed.token) {
             this.user = parsed.user
             this.token = parsed.token
             this.isAuthenticated = parsed.isAuthenticated
-            console.log('User restored from storage:', this.user)
+            console.log('✅ User restored from storage:', this.user)
             return true
           }
         }
       } catch (error) {
-        console.error('Error loading auth data:', error)
+        console.error('❌ Error loading auth data:', error)
         localStorage.removeItem('auth_data')
         localStorage.removeItem('auth_token')
         sessionStorage.removeItem('auth_data')
@@ -240,7 +253,6 @@ export const useAuthStore = defineStore('auth', {
     initialize() {
       const loaded = this.loadFromStorage()
       if (loaded && this.token) {
-        // Si on a un token, essayer de recharger les infos utilisateur
         this.fetchUserInfo()
       }
       return loaded

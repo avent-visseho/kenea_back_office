@@ -9,7 +9,7 @@
         </p>
       </div>
       <button @click="showCreateModal = true"
-        class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 text-sm font-semibold text-white hover:shadow-lg hover:shadow-blue-600/30 transition-all duration-300 hover:-translate-y-0.5">
+        class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-green-700 px-6 py-3 text-sm font-semibold text-white hover:shadow-lg hover:shadow-green-600/30 transition-all duration-300 hover:-translate-y-0.5">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -25,8 +25,8 @@
     </div>
 
     <div v-else-if="groupesList.length === 0" class="text-center py-12">
-      <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
-        <svg class="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-4">g-600 
+        <svg class="h-8 w-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
       </div>
@@ -36,16 +36,16 @@
 
     <div v-else class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <div v-for="groupe in groupesList" :key="groupe.id"
-        class="group relative rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/20 overflow-hidden">
+        class="group relative rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 hover:shadow-lg dark:hover:shadow-green-900/20 overflow-hidden">
         
         <!-- Gradient Background -->
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent dark:from-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-green-50 to-transparent dark:from-green-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
         <div class="relative p-6">
           <!-- Header -->
           <div class="flex items-start justify-between mb-4">
             <div class="flex-1">
-              <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 mb-3">
+              <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg shadow-green-500/30 mb-3">
                 <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
@@ -94,8 +94,8 @@
           <!-- Content -->
           <div class="space-y-3">
             <div class="flex items-center gap-2 text-sm">
-              <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-300">
-                <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 dark:bg-green-900/30 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-300">
+                <span class="h-2 w-2 rounded-full bg-green-500"></span>
                 ID: {{ groupe.id }}
               </span>
             </div>
@@ -108,7 +108,7 @@
           <!-- Footer Action -->
           <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button @click="loadSousGroupes(groupe)"
-              class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 px-4 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+              class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 px-4 py-2.5 text-sm font-medium text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

@@ -8,7 +8,7 @@
                 class="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm dark:border-blue-900/30 dark:from-blue-950/20 dark:to-gray-900">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-blue-600 dark:text-blue-400">Total</p>
+                        <p class="text10sm font-medium text-blue-600 dark:text-blue-400">Total</p>
                         <h4 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ stats.total }}</h4>
                     </div>
                     <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -26,7 +26,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-amber-600 dark:text-amber-400">En attente</p>
-                        <h4 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ stats.pending }}</h4>
+                        <h4 class="mt-10 text-2xl font-bold text-gray-900 dark:text-white">{{ stats.pending }}</h4>
                     </div>
                     <div
                         class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
@@ -44,7 +44,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-emerald-600 dark:text-emerald-400">Résolu</p>
-                        <h4 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ stats.resolved }}</h4>
+                        <h4 class="mt-10 text-2xl font-bold text-gray-900 dark:text-white">{{ stats.resolved }}</h4>
                     </div>
                     <div
                         class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
@@ -62,7 +62,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-purple-600 dark:text-purple-400">Aujourd'hui</p>
-                        <h4 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ stats.today }}</h4>
+                        <h4 class="mt-10 text-2xl font-bold text-gray-900 dark:text-white">{{ stats.today }}</h4>
                     </div>
                     <div
                         class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">

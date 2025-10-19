@@ -84,7 +84,7 @@ const router = createRouter({
       meta: {
         title: 'Groupe',
         requiresAuth: true,
-        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN'], */
       },
     },{
       path: '/inbox',
@@ -93,7 +93,7 @@ const router = createRouter({
       meta: {
         title: 'Groupe',
         requiresAuth: true,
-        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN'], */
       },
     },
     {
@@ -103,7 +103,7 @@ const router = createRouter({
       meta: {
         title: 'Pays',
         requiresAuth: true,
-        allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'USER'],
+        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'USER'], */
       },
     },
     {
@@ -123,7 +123,7 @@ const router = createRouter({
       meta: {
         title: 'Ordonnance',
         requiresAuth: true,
-        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+        /* allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], */
       },
     },{
       path: '/ordonnance-progression',
@@ -132,7 +132,7 @@ const router = createRouter({
       meta: {
         title: 'Ordonnance Progression',
         requiresAuth: true,
-        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+        /* allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], */
       },
     },
     {
@@ -142,7 +142,7 @@ const router = createRouter({
       meta: {
         title: 'Profile',
         requiresAuth: true,
-        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+        /* allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], */
       },
     },
     {

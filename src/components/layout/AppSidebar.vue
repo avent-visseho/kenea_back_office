@@ -184,9 +184,9 @@ const menuGroups = [
           { name: 'Pharmacie', path: '/pharmacie' },
           { name: 'categorie', path: '/categorie' },
           { name: 'produits', path: '/produits' },
-          { name: 'users', path: '/users' },
-          { name: 'roles', path: '/roles' },
           { name: 'privileges', path: '/privileges' },
+          { name: 'roles', path: '/roles' },
+          { name: 'users', path: '/users' },
         ],
       },
        {
