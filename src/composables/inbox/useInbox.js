@@ -33,6 +33,34 @@ export function useInbox() {
     }
   }
 
+  // ✅ NOUVEAU : Récupère les ordonnances avec détails pour un client
+  const fetchInboxByClientWithDetails = async (clientId) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await InboxServices.getInboxByClientWithDetails(clientId)
+
+      if (Array.isArray(response.data)) {
+        inboxList.value = response.data
+        return { success: true, data: inboxList.value }
+      }
+
+      if (response.data.body && Array.isArray(response.data.body)) {
+        inboxList.value = response.data.body
+        return { success: true, data: inboxList.value }
+      }
+
+      return { success: false, error: 'Erreur lors du chargement' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors du chargement'
+      console.error('❌ Erreur fetchInboxByClientWithDetails:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const fetchInboxByPharmacie = async (pharmacieId) => {
     isLoading.value = true
     error.value = null
@@ -117,13 +145,13 @@ export function useInbox() {
   // Statistiques calculées
   const stats = computed(() => ({
     total: inboxList.value.length,
-    pending: inboxList.value.filter(m => m.statut === 'PENDING').length,
-    resolved: inboxList.value.filter(m => m.statut !== 'PENDING').length,
-    today: inboxList.value.filter(m => {
+    pending: inboxList.value.filter((m) => m.statut === 'PENDING').length,
+    resolved: inboxList.value.filter((m) => m.statut !== 'PENDING').length,
+    today: inboxList.value.filter((m) => {
       const date = new Date(m.dateEnvoi)
       const today = new Date()
       return date.toDateString() === today.toDateString()
-    }).length
+    }).length,
   }))
 
   return {
@@ -134,6 +162,7 @@ export function useInbox() {
     fetchInboxAll,
     fetchInboxByPharmacie,
     fetchInboxByClient,
-    fetchInboxGlobal
+    fetchInboxByClientWithDetails, // ✅ NOUVEAU
+    fetchInboxGlobal,
   }
 }

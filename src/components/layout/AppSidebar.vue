@@ -10,46 +10,19 @@
     },
   ]" @mouseenter="!isExpanded && (isHovered = true)" @mouseleave="isHovered = false">
     <div :class="['py-8 flex', !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start']">
-      <!-- <router-link to="/">
-        <img   src="/images/logo/logo_Kenea_1.png"
-          alt="Logo" width="40" height="40" />
-        
-        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="/images/logo/logo_Kenea_1.png"
-          alt="Logo" width="150" height="40" />
-        <img v-else src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
-      </router-link> -->
-
       <router-link to="/">
-        <img
-          v-if="isExpanded || isHovered || isMobileOpen"
-          class="dark:hidden"
-          src="/images/logo/logo_Kenea_1.png"
-          alt="Logo"
-          width="50"
-          height="40"
-        />
-        <img
-          v-if="isExpanded || isHovered || isMobileOpen"
-          class="hidden dark:block"
-          src="/images/logo/logo_Kenea_1.png"
-          alt="Logo"
-          width="50"
-          height="40"
-        />
-        <img
-          v-else
-          src="/images/logo/logo_Kenea_1.png"
-          alt="Logo"
-          width="32"
-          height="32"
-        />
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="dark:hidden" src="/images/logo/logo_Kenea_1.png"
+          alt="Logo" width="50" height="40" />
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block"
+          src="/images/logo/logo_Kenea_1.png" alt="Logo" width="50" height="40" />
+        <img v-else src="/images/logo/logo_Kenea_1.png" alt="Logo" width="32" height="32" />
       </router-link>
     </div>
     <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
       <nav class="mb-6">
         <div class="flex flex-col gap-4">
-          <div v-for="(menuGroup, groupIndex) in menuGroups" :key="groupIndex">
-            <h2 :class="[
+          <div v-for="(menuGroup, groupIndex) in filteredMenuGroups" :key="groupIndex">
+            <h2 v-if="menuGroup.items.length > 0" :class="[
               'mb-4 text-xs uppercase flex leading-[20px] text-gray-400',
               !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start',
             ]">
@@ -75,9 +48,9 @@
                   ]">
                     <component :is="item.icon" />
                   </span>
-                  <span v-if="isExpanded || isHovered || isMobileOpen" class="menu-item-text">{{
-                    item.name
-                    }}</span>
+                  <span v-if="isExpanded || isHovered || isMobileOpen" class="menu-item-text">
+                    {{ item.name }}
+                  </span>
                   <ChevronDownIcon v-if="isExpanded || isHovered || isMobileOpen" :class="[
                     'ml-auto w-5 h-5 transition-transform duration-200',
                     {
@@ -97,9 +70,9 @@
                   ]">
                     <component :is="item.icon" />
                   </span>
-                  <span v-if="isExpanded || isHovered || isMobileOpen" class="menu-item-text">{{
-                    item.name
-                    }}</span>
+                  <span v-if="isExpanded || isHovered || isMobileOpen" class="menu-item-text">
+                    {{ item.name }}
+                  </span>
                 </router-link>
                 <transition @enter="startTransition" @after-enter="endTransition" @before-leave="startTransition"
                   @after-leave="endTransition">
@@ -152,7 +125,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-
+import { useAuth } from '@/composables/useAuth'
 import {
   GridIcon,
   CalenderIcon,
@@ -169,100 +142,126 @@ import BoxCubeIcon from '@/icons/BoxCubeIcon.vue'
 import { useSidebar } from '@/composables/useSidebar'
 
 const route = useRoute()
-
+const { hasAnyRole } = useAuth()
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar()
 
+// Configuration des menus avec les rôles requis
 const menuGroups = [
   {
+    title: 'Menu Principal',
     items: [
       {
         icon: GridIcon,
         name: 'Tableau de bord',
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
         subItems: [
-          /* { name: 'Dashboard', path: '/dashboard' }, */
-          { name: 'Pays', path: '/pays' },
-          { name: 'Pharmacie', path: '/pharmacie' },
-          { name: 'categorie', path: '/categorie' },
-          { name: 'produits', path: '/produits' },
-          { name: 'privileges', path: '/privileges' },
-          { name: 'roles', path: '/roles' },
-          { name: 'users', path: '/users' },
+          {
+            name: 'Pays',
+            path: '/pays',
+            allowedRoles: ['ADMIN', 'SUPER_ADMIN']
+          },
+          {
+            name: 'Pharmacie',
+            path: '/pharmacie',
+            allowedRoles: ['ADMIN', 'SUPER_ADMIN']
+          },
+          {
+            name: 'Catégorie',
+            path: '/categorie',
+            allowedRoles: ['ADMIN', 'SUPER_ADMIN']
+          },
+          {
+            name: 'Produits',
+            path: '/produits',
+            allowedRoles: ['ADMIN', 'SUPER_ADMIN']
+          },
+          {
+            name: 'Privilèges',
+            path: '/privileges',
+            allowedRoles: ['ADMIN', 'SUPER_ADMIN']
+          },
+          {
+            name: 'Rôles',
+            path: '/roles',
+            allowedRoles: ['ADMIN', 'SUPER_ADMIN']
+          },
+          {
+            name: 'Utilisateurs',
+            path: '/users',
+            allowedRoles: ['ADMIN', 'SUPER_ADMIN']
+          },
         ],
       },
-       {
+      {
         icon: CalenderIcon,
-        name: 'ordonnance',
+        name: 'Ordonnance',
         path: '/ordonnance',
-      },{
+        allowedRoles: ['USER'],
+      },
+      {
         icon: CalenderIcon,
-        name: 'traitement',
+        name: 'Traitement',
         path: '/ordonnance-progression',
-      },{
+        allowedRoles: ['PHARMACIE', 'ADMIN', 'SUPER_ADMIN'],
+      },
+      {
         icon: CalenderIcon,
-        name: 'groupe',
+        name: 'Groupe',
         path: '/groupe',
-      },{
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
+      },
+      {
         icon: CalenderIcon,
-        name: 'inbox',
+        name: 'Inbox',
         path: '/inbox',
-      }
-      /* {
-        icon: CalenderIcon,
-        name: 'Calendar',
-        path: '/calendar',
+        allowedRoles: ['USER'],
       },
-      {
-        icon: UserCircleIcon,
-        name: 'User Profile',
-        path: '/profile',
-      },
-
-      {
-        name: 'Forms',
-        icon: ListIcon,
-        subItems: [{ name: 'Form Elements', path: '/form-elements', pro: false }],
-      },
-      {
-        name: 'Tables',
-        icon: TableIcon,
-        subItems: [{ name: 'Basic Tables', path: '/basic-tables', pro: false }],
-      },
-      {
-        name: 'Pages',
-        icon: PageIcon,
-        subItems: [
-          { name: 'Black Page', path: '/blank', pro: false },
-          { name: '404 Page', path: '/error-404', pro: false },
-        ],
-      }, */
     ],
   },
-  /* {
-    title: 'Others',
-    items: [
-      {
-        icon: PieChartIcon,
-        name: 'Charts',
-        subItems: [
-          { name: 'Line Chart', path: '/line-chart', pro: false },
-          { name: 'Bar Chart', path: '/bar-chart', pro: false },
-        ],
-      },
-      {
-        icon: BoxCubeIcon,
-        name: 'Ui Elements',
-        subItems: [
-          { name: 'Alerts', path: '/alerts', pro: false },
-          { name: 'Avatars', path: '/avatars', pro: false },
-          { name: 'Badge', path: '/badge', pro: false },
-          { name: 'Buttons', path: '/buttons', pro: false },
-          { name: 'Images', path: '/images', pro: false },
-          { name: 'Videos', path: '/videos', pro: false },
-        ],
-      }
-    ],
-  }, */
 ]
+
+// Filtrer les items du menu selon les rôles de l'utilisateur
+const filteredMenuGroups = computed(() => {
+  return menuGroups
+    .map((group) => {
+      const filteredItems = group.items
+        .filter((item) => {
+          // Si l'item a des rôles requis, vérifier si l'utilisateur les a
+          if (item.allowedRoles && item.allowedRoles.length > 0) {
+            return hasAnyRole(...item.allowedRoles)
+          }
+          return true
+        })
+        .map((item) => {
+          // Filtrer les sous-items si présents
+          if (item.subItems) {
+            const filteredSubItems = item.subItems.filter((subItem) => {
+              if (subItem.allowedRoles && subItem.allowedRoles.length > 0) {
+                return hasAnyRole(...subItem.allowedRoles)
+              }
+              return true
+            })
+
+            // Ne garder l'item parent que s'il a des sous-items visibles
+            if (filteredSubItems.length > 0) {
+              return {
+                ...item,
+                subItems: filteredSubItems,
+              }
+            }
+            return null
+          }
+          return item
+        })
+        .filter((item) => item !== null)
+
+      return {
+        ...group,
+        items: filteredItems,
+      }
+    })
+    .filter((group) => group.items.length > 0)
+})
 
 const isActive = (path) => route.path === path
 
@@ -272,7 +271,7 @@ const toggleSubmenu = (groupIndex, itemIndex) => {
 }
 
 const isAnySubmenuRouteActive = computed(() => {
-  return menuGroups.some((group) =>
+  return filteredMenuGroups.value.some((group) =>
     group.items.some(
       (item) => item.subItems && item.subItems.some((subItem) => isActive(subItem.path)),
     ),
@@ -284,7 +283,9 @@ const isSubmenuOpen = (groupIndex, itemIndex) => {
   return (
     openSubmenu.value === key ||
     (isAnySubmenuRouteActive.value &&
-      menuGroups[groupIndex].items[itemIndex].subItems?.some((subItem) => isActive(subItem.path)))
+      filteredMenuGroups.value[groupIndex]?.items[itemIndex]?.subItems?.some((subItem) =>
+        isActive(subItem.path),
+      ))
   )
 }
 

@@ -15,7 +15,7 @@
                 d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
             <div>
-              <div>Boîte de réception Client</div>
+              <div>Mes Ordonnances</div>
               <div class="text-xs font-normal opacity-75">{{ stats.total }}</div>
             </div>
           </div>
@@ -51,7 +51,7 @@
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <div>Résolu</div>
+              <div>Approuvé</div>
               <div class="text-xs font-normal opacity-75">{{ stats.resolved }}</div>
             </div>
           </div>
@@ -66,7 +66,7 @@
           <div class="flex items-center gap-3">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 5a2 2 0 012-2h6a2 2 0 012 2v2H6V5zm0 4h12v9a2 2 0 01-2 2H8a2 2 0 01-2-2V9z" />
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <div>
               <div>Aujourd'hui</div>
@@ -103,9 +103,9 @@
       <div class="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-lg mb-4">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Boîte de réception Client</h2>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Mes Ordonnances</h2>
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {{ filteredInbox.length }} message{{ filteredInbox.length !== 1 ? 's' : '' }}
+              {{ filteredInbox.length }} ordonnance{{ filteredInbox.length !== 1 ? 's' : '' }}
             </p>
           </div>
           <button @click="refreshInbox"
@@ -122,7 +122,7 @@
 
       <!-- Messages List -->
       <div class="flex-1 overflow-y-auto space-y-3 pr-2">
-        <div v-if="isLoading" class="flex justify-center items-center py-12">
+        <div v-if="isLoading || isInitialLoading" class="flex justify-center items-center py-12">
           <div class="space-y-4 w-full">
             <div v-for="i in 3" :key="i"
               class="h-24 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-2xl animate-pulse">
@@ -137,8 +137,8 @@
                 d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
           </div>
-          <p class="text-gray-500 dark:text-gray-400 font-medium">Aucun message</p>
-          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Votre boîte de réception Client est vide</p>
+          <p class="text-gray-500 dark:text-gray-400 font-medium">Aucune ordonnance</p>
+          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Vous n'avez envoyé aucune ordonnance</p>
         </div>
 
         <div v-else v-for="message in filteredInbox" :key="message.id" @click="selectedMessage = message" :class="[
@@ -159,7 +159,7 @@
                   ]">
                     <span class="h-2 w-2 rounded-full"
                       :class="message.statut === 'PENDING' ? 'bg-amber-500' : 'bg-emerald-500'"></span>
-                    {{ message.statut === 'PENDING' ? 'En attente' : 'Résolu' }}
+                    {{ message.statut === 'PENDING' ? 'En attente' : 'Approuvé' }}
                   </div>
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ message.code }}</span>
                 </div>
@@ -167,14 +167,14 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
                   {{ message.pharmacieNom }}
                 </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
-                  De: {{ message.clientNom }}
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ message.detail?.length || 0 }} réponse(s)
                 </p>
               </div>
 
               <div class="ml-4 flex-shrink-0 text-right">
                 <div class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ message.total || 'N/A' }}
+                  {{ getTotalAmount(message) }}
                 </div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {{ formatTime(message.dateEnvoi) }}
@@ -199,7 +199,7 @@
 
     <!-- Detail Panel -->
     <div v-if="selectedMessage"
-      class="w-180 flex-shrink-0 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-lg overflow-y-auto">
+      class="w-96 flex-shrink-0 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-lg overflow-y-auto relative">
       <button @click="selectedMessage = null"
         class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,17 +207,12 @@
         </svg>
       </button>
 
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Détails</h3>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Détails de l'ordonnance</h3>
 
       <div class="space-y-4">
         <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
           <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Pharmacie</p>
           <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedMessage.pharmacieNom }}</p>
-        </div>
-
-        <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
-          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Client</p>
-          <p class="text-sm text-gray-900 dark:text-white break-all">{{ selectedMessage.clientNom }}</p>
         </div>
 
         <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
@@ -242,13 +237,80 @@
 
           <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
             <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Total</p>
-            <p class="text-lg font-bold text-gray-900 dark:text-white">{{ selectedMessage.total || '--' }}</p>
+            <p class="text-lg font-bold text-gray-900 dark:text-white">{{ getTotalAmount(selectedMessage) }}</p>
           </div>
         </div>
 
         <div class="rounded-lg bg-gray-50 dark:bg-gray-700 p-4">
           <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Date d'envoi</p>
           <p class="text-sm text-gray-900 dark:text-white">{{ formatDateTime(selectedMessage.dateEnvoi) }}</p>
+        </div>
+
+        <!-- ✅ NOUVEAU : Affichage des détails de réponse -->
+        <div v-if="selectedMessage.detail && Array.isArray(selectedMessage.detail) && selectedMessage.detail.length > 0"
+          class="space-y-4">
+          <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3">
+              Réponses des pharmacies ({{ selectedMessage.detail.length }})
+            </h4>
+
+            <div v-for="detail in selectedMessage.detail" :key="detail.id"
+              class="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 p-4 border border-emerald-200 dark:border-emerald-900/30 mb-3">
+
+              <div class="flex items-center justify-between mb-3">
+                <span :class="[
+                  'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
+                  detail.statut === 'APPROVED'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                ]">
+                  {{ detail.statut }}
+                </span>
+                <p class="text-sm font-bold text-emerald-900 dark:text-emerald-300">
+                  {{ detail.total }} FCFA
+                </p>
+              </div>
+
+              <div class="text-xs text-emerald-700 dark:text-emerald-400 mb-3">
+                <p>✓ Disponible: {{ detail.totalDisponible }} FCFA</p>
+                <p v-if="detail.totalNonDisponible > 0">✗ Non disponible: {{ detail.totalNonDisponible }} FCFA</p>
+                <p class="mt-1">Répondu le {{ formatDateTime(detail.dateReponse) }}</p>
+              </div>
+
+              <!-- Produits -->
+              <div v-if="detail.produits && Array.isArray(detail.produits) && detail.produits.length > 0"
+                class="space-y-2">
+                <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
+                  Produits ({{ detail.produits.length }})
+                </p>
+
+                <div v-for="produit in detail.produits" :key="produit.id"
+                  class="bg-white dark:bg-gray-800 rounded p-2 text-xs">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <p class="font-medium text-gray-900 dark:text-white">{{ produit.nomProduit }}</p>
+                      <p class="text-gray-500 dark:text-gray-400">
+                        Qté: {{ produit.quantite }} × {{ produit.prixUnitaire }} FCFA
+                      </p>
+                    </div>
+                    <div class="flex flex-col items-end">
+                      <p class="font-bold text-gray-900 dark:text-white">
+                        {{ produit.quantite * produit.prixUnitaire }} FCFA
+                      </p>
+                      <span :class="[
+                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs',
+                        produit.disponible
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                          : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      ]">
+                        {{ produit.disponible ? '✓ Disponible' : '✗ Indisponible' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div v-if="selectedMessage.dateReponse"
@@ -259,30 +321,36 @@
         </div>
 
         <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-          <button @click="openPaymentModal(selectedMessage)"
+          <button v-if="selectedMessage.statut === 'APPROVED' && getTotalAmount(selectedMessage) !== 'N/A'"
+            @click="openPaymentModal(selectedMessage)"
             class="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2.5 text-sm font-medium text-white hover:shadow-lg hover:shadow-blue-600/30 transition-all">
-            Payer
+            💳 Payer {{ getTotalAmount(selectedMessage) }}
+          </button>
+          <button v-else-if="selectedMessage.statut === 'PENDING'" disabled
+            class="w-full rounded-lg bg-gray-300 dark:bg-gray-600 px-4 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 cursor-not-allowed">
+            ⏳ En attente de réponse
           </button>
           <button
             class="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            Voir l'ordonnance
+            📄 Voir l'ordonnance
           </button>
         </div>
       </div>
     </div>
+
     <PaymentModal :showModal="showPaymentModal" :paymentData="paymentData" @close="showPaymentModal = false"
       @paymentSuccess="handlePaymentSuccess" @paymentError="(err) => console.error(err)" />
-
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useInbox } from '@/composables/inbox/useInbox'
+import { useAuthStore } from '@/store/auth/auth'
 import PaymentModal from './PaymentModal.vue'
 
-
-const { inboxList, isLoading, stats, fetchInboxGlobal } = useInbox()
+const authStore = useAuthStore()
+const { inboxList, isLoading, stats, fetchInboxByClientWithDetails } = useInbox()
 
 const activeFilter = ref('all')
 const selectedPharmacie = ref(null)
@@ -291,41 +359,60 @@ const searchQuery = ref('')
 
 const showPaymentModal = ref(false)
 const paymentData = ref(null)
+const isInitialLoading = ref(true)
 
 const uniquePharmacies = computed(() => {
-  return [...new Set(inboxList.value.map(m => m.pharmacieNom))]
+  if (!Array.isArray(inboxList.value)) return []
+  return [...new Set(inboxList.value.map(m => m?.pharmacieNom).filter(Boolean))]
 })
 
 const filteredInbox = computed(() => {
+  if (!Array.isArray(inboxList.value)) return []
+
   let filtered = inboxList.value
 
   // Filter by active filter
   if (activeFilter.value === 'pending') {
-    filtered = filtered.filter(m => m.statut === 'PENDING')
+    filtered = filtered.filter(m => m?.statut === 'PENDING')
   } else if (activeFilter.value === 'resolved') {
-    filtered = filtered.filter(m => m.statut !== 'PENDING')
+    filtered = filtered.filter(m => m?.statut === 'APPROVED')
   } else if (activeFilter.value === 'today') {
     const today = new Date()
     filtered = filtered.filter(m => {
+      if (!m?.dateEnvoi) return false
       const date = new Date(m.dateEnvoi)
       return date.toDateString() === today.toDateString()
     })
   } else if (activeFilter.value === 'pharmacie' && selectedPharmacie.value) {
-    filtered = filtered.filter(m => m.pharmacieNom === selectedPharmacie.value)
+    filtered = filtered.filter(m => m?.pharmacieNom === selectedPharmacie.value)
   }
 
   // Filter by search
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(m =>
-      m.code.toLowerCase().includes(query) ||
-      m.pharmacieNom.toLowerCase().includes(query) ||
-      m.clientNom.toLowerCase().includes(query)
+      m?.code?.toLowerCase().includes(query) ||
+      m?.pharmacieNom?.toLowerCase().includes(query) ||
+      m?.clientNom?.toLowerCase().includes(query)
     )
   }
 
-  return filtered.sort((a, b) => new Date(b.dateEnvoi) - new Date(a.dateEnvoi))
+  return filtered.sort((a, b) => {
+    const dateA = a?.dateEnvoi ? new Date(a.dateEnvoi) : new Date(0)
+    const dateB = b?.dateEnvoi ? new Date(b.dateEnvoi) : new Date(0)
+    return dateB - dateA
+  })
 })
+
+// ✅ Calculer le montant total de toutes les réponses
+const getTotalAmount = (message) => {
+  if (!message || !message.detail || !Array.isArray(message.detail) || message.detail.length === 0) {
+    return 'N/A'
+  }
+
+  const total = message.detail.reduce((sum, detail) => sum + (detail?.total || 0), 0)
+  return total > 0 ? `${total} FCFA` : 'N/A'
+}
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
@@ -352,24 +439,66 @@ const formatDateTime = (date) => {
 }
 
 const refreshInbox = async () => {
-  await fetchInboxGlobal()
+  const userId = authStore.user?.id
+  if (!userId) {
+    console.error('❌ User ID not found')
+    return
+  }
+
+  console.log('🔄 Refreshing inbox for user:', userId)
+  await fetchInboxByClientWithDetails(userId)
 }
 
 const openPaymentModal = (message) => {
+  if (!message || !message.detail || !Array.isArray(message.detail)) {
+    console.error('❌ Données de message invalides')
+    return
+  }
+
+  // Calculer le montant total depuis les détails
+  const totalAmount = message.detail.reduce((sum, detail) => sum + (detail?.total || 0), 0)
+
+  if (totalAmount <= 0) {
+    console.error('❌ Montant total invalide')
+    return
+  }
+
   paymentData.value = {
-    amount: message.total, // Montant depuis selectedMessage.total
-    description: `Paiement Ordonnance ${message.code}`
+    amount: totalAmount,
+    description: `Paiement Ordonnance ${message.code}`,
+    ordonnanceId: message.id,
+    pharmacieId: message.pharmacieId
   }
   showPaymentModal.value = true
 }
 
 const handlePaymentSuccess = (data) => {
-  console.log('Paiement réussi:', data)
+  console.log('✅ Paiement réussi:', data)
   showPaymentModal.value = false
-  // Rafraîchir la liste, afficher une notification, etc.
+  refreshInbox()
+  // TODO: Afficher une notification de succès
 }
 
 onMounted(async () => {
-  await fetchInboxGlobal()
+  isInitialLoading.value = true
+
+  const userId = authStore.user?.id
+
+  if (!userId) {
+    console.error('❌ User ID not found in store')
+    console.log('Store user:', authStore.user)
+    isInitialLoading.value = false
+    return
+  }
+
+  console.log('✅ Loading inbox for user:', userId)
+
+  try {
+    await fetchInboxByClientWithDetails(userId)
+  } catch (error) {
+    console.error('❌ Error loading inbox:', error)
+  } finally {
+    isInitialLoading.value = false
+  }
 })
 </script>

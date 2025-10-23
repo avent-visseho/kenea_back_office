@@ -19,7 +19,7 @@ const router = createRouter({
       meta: {
         title: 'Dashboard',
         requiresAuth: true,
-        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], // Tous les utilisateurs authentifiés
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN', 'PHARMACIE'],
       },
     },
     {
@@ -29,52 +29,57 @@ const router = createRouter({
       meta: {
         title: 'Pharmacie',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
-    },{
+    },
+    {
       path: '/categorie',
       name: 'categorie',
       component: () => import('../views/pharmacie/CategorieView.vue'),
       meta: {
         title: 'Categorie',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
-    },{
+    },
+    {
       path: '/produits',
       name: 'produits',
       component: () => import('../views/pharmacie/ProduitsView.vue'),
       meta: {
-        title: 'produits',
+        title: 'Produits',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
-    },{
+    },
+    {
       path: '/users',
       name: 'users',
       component: () => import('../views/users/Userview.vue'),
       meta: {
-        title: 'users',
+        title: 'Users',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
-    },{
+    },
+    {
       path: '/roles',
       name: 'roles',
       component: () => import('../views/roles/RolesView.vue'),
       meta: {
-        title: 'roles',
+        title: 'Roles',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
-    },{
+    },
+    {
       path: '/privileges',
       name: 'privileges',
       component: () => import('../views/privileges/PrivilegesView.vue'),
       meta: {
-        title: 'privileges',
+        title: 'Privileges',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'PHARMACIEN'], */ // Exemple
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -84,16 +89,17 @@ const router = createRouter({
       meta: {
         title: 'Groupe',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN'], */
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
-    },{
+    },
+    {
       path: '/inbox',
       name: 'inbox',
       component: () => import('../views/inbox/InboxView.vue'),
       meta: {
-        title: 'Groupe',
+        title: 'Inbox',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN'], */
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -103,7 +109,7 @@ const router = createRouter({
       meta: {
         title: 'Pays',
         requiresAuth: true,
-        /* allowedRoles: ['ADMIN', 'SUPER_ADMIN', 'USER'], */
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -123,16 +129,17 @@ const router = createRouter({
       meta: {
         title: 'Ordonnance',
         requiresAuth: true,
-        /* allowedRoles: ['USER'], */
+        allowedRoles: ['USER'],
       },
-    },{
+    },
+    {
       path: '/ordonnance-progression',
       name: 'ordonnance-progression',
       component: () => import('../views/ordonnance/OrdonnanceProgressionsView.vue'),
       meta: {
         title: 'Ordonnance Progression',
         requiresAuth: true,
-        /* allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], */
+        allowedRoles: ['PHARMACIE', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -142,7 +149,7 @@ const router = createRouter({
       meta: {
         title: 'Profile',
         requiresAuth: true,
-        /* allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], */
+        allowedRoles: ['USER', 'ADMIN', 'PHARMACIE', 'SUPER_ADMIN'],
       },
     },
     {
@@ -170,6 +177,7 @@ const router = createRouter({
       name: 'Line Chart',
       component: () => import('../views/Chart/LineChart/LineChart.vue'),
       meta: {
+        title: 'Line Chart',
         requiresAuth: true,
         allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
@@ -179,6 +187,7 @@ const router = createRouter({
       name: 'Bar Chart',
       component: () => import('../views/Chart/BarChart/BarChart.vue'),
       meta: {
+        title: 'Bar Chart',
         requiresAuth: true,
         allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
       },
@@ -190,6 +199,7 @@ const router = createRouter({
       meta: {
         title: 'Alerts',
         requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -199,6 +209,7 @@ const router = createRouter({
       meta: {
         title: 'Avatars',
         requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -208,6 +219,7 @@ const router = createRouter({
       meta: {
         title: 'Badge',
         requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -217,6 +229,7 @@ const router = createRouter({
       meta: {
         title: 'Buttons',
         requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -226,6 +239,7 @@ const router = createRouter({
       meta: {
         title: 'Images',
         requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -235,6 +249,7 @@ const router = createRouter({
       meta: {
         title: 'Videos',
         requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -244,6 +259,7 @@ const router = createRouter({
       meta: {
         title: 'Blank',
         requiresAuth: true,
+        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
       },
     },
     {
@@ -268,7 +284,7 @@ const router = createRouter({
       component: () => import('../views/Auth/Signin.vue'),
       meta: {
         title: 'Signin',
-        guest: true, // Page accessible seulement si non connecté
+        guest: true,
       },
     },
     {
@@ -289,7 +305,6 @@ const router = createRouter({
         guest: true,
       },
     },
-    // Catch all - 404
     {
       path: '/:pathMatch(.*)*',
       redirect: '/error-404',
@@ -297,10 +312,10 @@ const router = createRouter({
   ],
 })
 
-// ✅ GUARD DE NAVIGATION GLOBAL
-router.beforeEach((to, from, next) => {
+// ✅ GUARD DE NAVIGATION GLOBAL AMÉLIORÉ
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  
+
   // Mettre à jour le titre
   document.title = `Kenea ${to.meta.title || ''}`
 
@@ -308,36 +323,74 @@ router.beforeEach((to, from, next) => {
   const isGuest = to.meta.guest
   const allowedRoles = to.meta.allowedRoles
 
-/*   console.log('Navigation vers:', to.path)
-  console.log('Authentifié:', authStore.isAuthenticated)
-  console.log('User:', authStore.user) */
-
   // ✅ Si la page nécessite d'être authentifié
   if (requiresAuth) {
+    // Vérifier si l'utilisateur est authentifié
     if (!authStore.isAuthenticated || !authStore.token) {
-     /*  console.log('❌ Non authentifié, redirection vers /signin') */
+      console.warn('❌ Accès refusé: Utilisateur non authentifié')
+      return next({
+        path: '/signin',
+        query: { redirect: to.fullPath }, // Sauvegarder la page demandée
+      })
+    }
+
+    // Vérifier si l'utilisateur existe dans le store
+    if (!authStore.user || !authStore.user.roles) {
+      console.error('❌ Erreur: Données utilisateur manquantes')
+      authStore.logout()
       return next('/signin')
     }
 
     // ✅ Vérifier les rôles si spécifiés
     if (allowedRoles && allowedRoles.length > 0) {
-      const userRoles = authStore.user?.roles || []
-      const hasPermission = userRoles.some(role => allowedRoles.includes(role))
-      
+      // Extraire les noms des rôles de l'utilisateur
+      const userRoles = authStore.user.roles.map((role) => role.name)
+
+      // Vérifier si l'utilisateur a au moins un des rôles requis
+      const hasPermission = userRoles.some((role) => allowedRoles.includes(role))
+
       if (!hasPermission) {
-        /* console.log('❌ Rôle insuffisant, redirection vers /forbidden') */
-        return next('/forbidden')
+        console.warn('❌ Accès refusé: Rôle insuffisant')
+        console.warn(`Rôles requis: ${allowedRoles.join(', ')}`)
+        console.warn(`Rôles utilisateur: ${userRoles.join(', ')}`)
+
+        return next({
+          path: '/forbidden',
+          query: {
+            from: to.fullPath,
+            required: allowedRoles.join(','),
+          },
+        })
       }
+
+      console.log('✅ Accès autorisé:', to.path)
     }
   }
 
-  // ✅ Si c'est une page "guest" (signin, signup) et l'utilisateur est connecté
+  // ✅ Si c'est une page "guest" et l'utilisateur est connecté
   if (isGuest && authStore.isAuthenticated) {
-   /*  console.log('✅ Déjà connecté, redirection vers /dashboard') */
-    return next('/pharmacie')
+    console.log('✅ Déjà connecté, redirection vers le dashboard')
+
+    // Rediriger vers la page appropriée selon le rôle
+    const userRoles = authStore.user?.roles?.map((role) => role.name) || []
+
+    if (userRoles.includes('ADMIN') || userRoles.includes('SUPER_ADMIN')) {
+      return next('/dashboard')
+    } else if (userRoles.includes('PHARMACIE')) {
+      return next('/ordonnance-progression')
+    } else if (userRoles.includes('USER')) {
+      return next('/ordonnance')
+    } else {
+      return next('/dashboard')
+    }
   }
 
   next()
+})
+
+// ✅ Gestion des erreurs de navigation
+router.onError((error) => {
+  console.error('Erreur de navigation:', error)
 })
 
 export default router

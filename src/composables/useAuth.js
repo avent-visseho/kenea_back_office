@@ -19,6 +19,24 @@ export const useAuth = () => {
   const userPerson = computed(() => authStore.userPerson)
   const displayName = computed(() => authStore.displayName)
 
+  // ✅ Obtenir les privilèges de l'utilisateur
+  const userPrivileges = computed(() => {
+    if (!authStore.user || !authStore.user.roles) return []
+
+    const privileges = new Set()
+    authStore.user.roles.forEach((role) => {
+      if (role.privileges) {
+        role.privileges.forEach((privilege) => {
+          if (!privilege.deleted) {
+            privileges.add(privilege.name)
+          }
+        })
+      }
+    })
+
+    return Array.from(privileges)
+  })
+
   // ✅ Vérifier si l'utilisateur a un rôle spécifique
   const hasRole = (role) => {
     return authStore.hasRole(role)
@@ -34,6 +52,56 @@ export const useAuth = () => {
     return roles.every((role) => authStore.hasRole(role))
   }
 
+  // ✅ Vérifier si l'utilisateur a un privilège spécifique
+  const hasPrivilege = (privilegeName) => {
+    return userPrivileges.value.includes(privilegeName)
+  }
+
+  // ✅ Vérifier si l'utilisateur a au moins un des privilèges
+  const hasAnyPrivilege = (...privileges) => {
+    return privileges.some((privilege) => userPrivileges.value.includes(privilege))
+  }
+
+  // ✅ Vérifier si l'utilisateur a tous les privilèges
+  const hasAllPrivileges = (...privileges) => {
+    return privileges.every((privilege) => userPrivileges.value.includes(privilege))
+  }
+
+  // ✅ Vérifier si l'utilisateur peut accéder à une route
+  const canAccessRoute = (routeMeta) => {
+    if (!routeMeta) return true
+
+    // Si la route nécessite l'authentification
+    if (routeMeta.requiresAuth && !authStore.isAuthenticated) {
+      return false
+    }
+
+    // Si des rôles sont requis
+    if (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0) {
+      return hasAnyRole(...routeMeta.allowedRoles)
+    }
+
+    return true
+  }
+
+  // ✅ Vérifier les types d'utilisateurs
+  const isAdmin = computed(() => hasAnyRole('ADMIN', 'SUPER_ADMIN'))
+  const isPharmacy = computed(() => hasRole('PHARMACIE'))
+  const isUser = computed(() => hasRole('USER'))
+  const isSuperAdmin = computed(() => hasRole('SUPER_ADMIN'))
+
+  // ✅ Obtenir la page d'accueil selon le rôle
+  const getHomeRoute = () => {
+    if (hasAnyRole('ADMIN', 'SUPER_ADMIN')) {
+      return '/dashboard'
+    } else if (hasRole('PHARMACIE')) {
+      return '/ordonnance-progression'
+    } else if (hasRole('USER')) {
+      return '/ordonnance'
+    }
+    return '/dashboard'
+  }
+
   // ✅ Connexion (étape 1: email/phone + password)
   const signIn = async (credentials) => {
     try {
@@ -43,7 +111,8 @@ export const useAuth = () => {
         return result
       }
       if (result.success && !result.requiresOtp) {
-        await router.push('/pharmacie')
+        // Rediriger vers la page appropriée selon le rôle
+        await router.push(getHomeRoute())
         return result
       }
       throw new Error(result.error || 'Erreur de connexion')
@@ -58,7 +127,8 @@ export const useAuth = () => {
     try {
       const result = await authStore.verifyOtp(otp)
       if (result.success) {
-        await router.push('/pharmacie')
+        // Rediriger vers la page appropriée selon le rôle
+        await router.push(getHomeRoute())
         return result
       }
       throw new Error(result.error || 'Code OTP invalide')
@@ -103,6 +173,7 @@ export const useAuth = () => {
     userRoles,
     userPerson,
     displayName,
+    userPrivileges,
 
     // Actions
     signIn,
@@ -114,5 +185,20 @@ export const useAuth = () => {
     hasRole,
     hasAnyRole,
     hasAllRoles,
+
+    // Privilege checks
+    hasPrivilege,
+    hasAnyPrivilege,
+    hasAllPrivileges,
+
+    // Route access
+    canAccessRoute,
+    getHomeRoute,
+
+    // User type checks
+    isAdmin,
+    isPharmacy,
+    isUser,
+    isSuperAdmin,
   }
 }
