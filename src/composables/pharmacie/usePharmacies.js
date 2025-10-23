@@ -2,11 +2,16 @@
 import { ref } from 'vue'
 import { PharmaciesService } from '../../api/services/pharmacie'
 
+// ✅ Variables partagées entre toutes les instances
 const pharmaciesList = ref([])
+const sugestPharmaciesList = ref([])
 const isLoading = ref(false)
 const error = ref(null)
 
 export function usePharmaciesVille() {
+  // ✅ searchResults est local à chaque instance
+  const searchResults = ref([])
+
   const fetchPharmaciesList = async (deleted = false) => {
     isLoading.value = true
     error.value = null
@@ -19,7 +24,6 @@ export function usePharmaciesVille() {
         return { success: true, data: pharmaciesList.value }
       }
 
-      // Si les données sont dans response.data.body
       if (response.data.body && Array.isArray(response.data.body)) {
         pharmaciesList.value = response.data.body
         return { success: true, data: pharmaciesList.value }
@@ -35,15 +39,77 @@ export function usePharmaciesVille() {
     }
   }
 
+  const fetchSugestPharmaciesList = async () => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await PharmaciesService.getSugestPharmaciesList()
+
+      if (Array.isArray(response.data)) {
+        sugestPharmaciesList.value = response.data
+        return { success: true, data: sugestPharmaciesList.value }
+      }
+
+      if (response.data.body && Array.isArray(response.data.body)) {
+        sugestPharmaciesList.value = response.data.body
+        return { success: true, data: sugestPharmaciesList.value }
+      }
+
+      return { success: false, error: 'Erreur lors du chargement des pharmacies suggérées' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors du chargement des pharmacies suggérées'
+      console.error('❌ Erreur fetchSugestPharmaciesList:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // ✅ Recherche par mot-clé
+  const searchPharmaciesByKeyword = async (keyword) => {
+    if (!keyword || keyword.trim().length < 2) {
+      searchResults.value = []
+      return { success: true, data: [] }
+    }
+
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await PharmaciesService.searchPharmaciesByKeyword(keyword.trim())
+      
+      console.log('🔍 Résultat recherche:', response.data)
+
+      if (Array.isArray(response.data)) {
+        searchResults.value = response.data
+        return { success: true, data: searchResults.value }
+      }
+
+      if (response.data.body && Array.isArray(response.data.body)) {
+        searchResults.value = response.data.body
+        return { success: true, data: searchResults.value }
+      }
+
+      searchResults.value = []
+      return { success: true, data: [] }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors de la recherche'
+      console.error('❌ Erreur searchPharmaciesByKeyword:', err)
+      searchResults.value = []
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const createPharmacies = async (pharmaciesData) => {
     isLoading.value = true
     error.value = null
 
     try {
-      
       const response = await PharmaciesService.addPharmacies(pharmaciesData)
 
-      // ✅ Gérer différents formats de réponse
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 201) {
         const newPharmacie = response.data.body || response.data
         
@@ -60,13 +126,7 @@ export function usePharmaciesVille() {
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Erreur lors de la création'
       error.value = errorMsg
-      
-      console.error('❌ Erreur createPharmacies:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status
-      })
-      
+      console.error('❌ Erreur createPharmacies:', err)
       return { success: false, error: errorMsg }
     } finally {
       isLoading.value = false
@@ -78,9 +138,7 @@ export function usePharmaciesVille() {
     error.value = null
 
     try {
-      
       const response = await PharmaciesService.updatePharmacies(id, pharmaciesData)
-      
 
       if (response.data.status === 'SUCCESS' || response.status === 200) {
         const updatedPharmacie = response.data.body || response.data
@@ -102,14 +160,7 @@ export function usePharmaciesVille() {
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Erreur lors de la modification'
       error.value = errorMsg
-      
-      console.error('❌ Erreur updatePharmacies:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-        url: err.config?.url
-      })
-      
+      console.error('❌ Erreur updatePharmacies:', err)
       return { success: false, error: errorMsg }
     } finally {
       isLoading.value = false
@@ -121,9 +172,7 @@ export function usePharmaciesVille() {
     error.value = null
 
     try {
-      
       const response = await PharmaciesService.deletePharmacies(id)
-      
 
       if (response.data.status === 'SUCCESS' || response.status === 200 || response.status === 204) {
         pharmaciesList.value = pharmaciesList.value.filter(p => 
@@ -136,21 +185,14 @@ export function usePharmaciesVille() {
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Erreur lors de la suppression'
       error.value = errorMsg
-      
-      console.error('❌ Erreur deletePharmacies:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status
-      })
-      
+      console.error('❌ Erreur deletePharmacies:', err)
       return { success: false, error: errorMsg }
     } finally {
       isLoading.value = false
     }
   }
 
-  // ✅ NOUVEAU: Import CSV avec ville_id
-  const importPharmaciesCsv = async (file, villeId) => {
+  const importPharmaciesCsv = async (file) => {
     isLoading.value = true
     error.value = null
 
@@ -158,7 +200,7 @@ export function usePharmaciesVille() {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await PharmaciesService.importPharmaciesCsv(formData, villeId)
+      const response = await PharmaciesService.importPharmaciesCsv(formData)
       
       if (response.data.status === 'SUCCESS' || response.status === 200) {
         await fetchPharmaciesList()
@@ -175,16 +217,19 @@ export function usePharmaciesVille() {
     }
   }
 
-  // ✅ NOUVEAU: Export CSV
   const exportPharmaciesCsv = () => {
     try {
-      const headers = ['Nom', 'Ville', 'Téléphone', 'Statut']
+      const headers = ['Nom', 'Region', 'Ville', 'Téléphone', 'Statut', 'de Garde', 'Nom Gérant', 'Prénoms Gérant']
       
       const rows = pharmaciesList.value.map(pharmacie => [
         pharmacie.nom || pharmacie.name || '',
         pharmacie.ville_nom || '',
+        pharmacie.region || '',
         pharmacie.telephone || pharmacie.phone || '',
-        pharmacie.active ? 'Actif' : 'Inactif'
+        pharmacie.nameGerant || pharmacie.nameGerant || '',
+        pharmacie.prenomGerant || pharmacie.prenomGerant || '',
+        pharmacie.active ? 'Actif' : 'Inactif',
+        pharmacie.deGarde ? 'true' : 'false'
       ])
 
       const csvContent = [
@@ -211,15 +256,20 @@ export function usePharmaciesVille() {
     }
   }
 
+  // ✅ IMPORTANT: Retourner searchResults et searchPharmaciesByKeyword
   return {
     isLoading,
     error,
     pharmaciesList,
+    sugestPharmaciesList,
+    searchResults,
     fetchPharmaciesList,
+    fetchSugestPharmaciesList,
+    searchPharmaciesByKeyword,
     createPharmacies,
     updatePharmacies,
     deletePharmacies,
-    importPharmaciesCsv,  // ✅ NOUVEAU
-    exportPharmaciesCsv,  // ✅ NOUVEAU
+    importPharmaciesCsv,
+    exportPharmaciesCsv,
   }
 }

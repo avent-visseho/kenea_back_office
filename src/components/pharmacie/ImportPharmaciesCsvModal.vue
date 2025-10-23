@@ -18,7 +18,7 @@
       <!-- Body -->
       <div class="px-6 py-4 space-y-4">
         <!-- Sélection de la ville -->
-        <div>
+       <!--  <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Sélectionner la ville <span class="text-red-500">*</span>
           </label>
@@ -33,7 +33,7 @@
           <p v-if="!selectedVilleId && showError" class="mt-1 text-sm text-red-600 dark:text-red-400">
             Veuillez sélectionner une ville
           </p>
-        </div>
+        </div> -->
 
         <!-- Info -->
         <div class="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-200 dark:border-teal-800">
@@ -61,9 +61,10 @@
           </label>
           <div class="relative">
             <input ref="fileInput" type="file" accept=".csv" @change="handleFileChange"
-              class="hidden" :disabled="isUploading" />
+              class="hidden"  />  <!-- :disabled="isUploading" -->
 
-            <button @click="triggerFileInput" :disabled="isUploading || !selectedVilleId"
+                <!-- :disabled="isUploading || !selectedVilleId" -->
+            <button @click="triggerFileInput" 
               class="w-full px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-teal-500 bg-gray-50 hover:bg-teal-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-teal-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               <div class="flex items-center justify-center gap-2">
                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,9 +77,9 @@
               </div>
             </button>
           </div>
-          <p v-if="!selectedFile && showError && selectedVilleId" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          <p v-if="!selectedFile && showError " class="mt-1 text-sm text-red-600 dark:text-red-400">
             Veuillez sélectionner un fichier
-          </p>
+          </p> <!-- && selectedVilleId -->
         </div>
 
         <!-- Progress bar -->
@@ -121,30 +122,39 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-const props = defineProps({
+/* const props = defineProps({
   citiesList: {
     type: Array,
     required: true
   }
-})
+}) */
 
 const emit = defineEmits(['close', 'import'])
 
 const fileInput = ref(null)
-const selectedVilleId = ref('')
+//const selectedVilleId = ref('')
 const selectedFile = ref(null)
 const showError = ref(false)
 const isUploading = ref(false)
 const uploadProgress = ref(0)
 
-const canImport = computed(() => {
+/* const canImport = computed(() => {
   return selectedVilleId.value && selectedFile.value
-})
+}) */
 
-const triggerFileInput = () => {
+/* const triggerFileInput = () => {
   if (selectedVilleId.value) {
     fileInput.value?.click()
   }
+} */
+
+
+const canImport = computed(() => {
+  return selectedFile.value
+})
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
 }
 
 const handleFileChange = (event) => {
@@ -178,7 +188,7 @@ const handleImport = async () => {
 
   try {
     await emit('import', {
-      villeId: selectedVilleId.value,
+     /*  villeId: selectedVilleId.value, */
       file: selectedFile.value
     })
     

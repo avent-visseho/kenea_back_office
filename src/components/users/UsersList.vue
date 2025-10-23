@@ -11,25 +11,33 @@
 
         <div class="flex items-center gap-3">
           <!-- Bouton Import CSV -->
-          <button
-            @click="showImportModal = true"
-            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-          >
+          <button @click="showImportModal = true"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             Importer CSV
           </button>
 
           <!-- Bouton Export CSV -->
-          <button
-            @click="handleExport"
-            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-          >
+          <button @click="handleExport"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
             </svg>
             Exporter CSV
+          </button>
+
+          <!-- Bouton Assigner Entités -->
+          <button @click="showAssignEntityModal = true"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Assigner Entités
           </button>
         </div>
       </div>
@@ -120,34 +128,25 @@
             </td>
             <td class="py-3">
               <div class="flex flex-wrap gap-1">
-                <span 
-                  v-for="role in user.roles" 
-                  :key="role.id"
-                  class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
-                >
+                <span v-for="role in user.roles" :key="role.id"
+                  class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
                   {{ role.name }}
                 </span>
               </div>
             </td>
             <td class="py-3 whitespace-nowrap">
-              <span 
-                v-if="user.enabled && !user.locked"
-                class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400"
-              >
+              <span v-if="user.enabled && !user.locked"
+                class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
                 <span class="h-1.5 w-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
                 Actif
               </span>
-              <span 
-                v-else-if="user.locked"
-                class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400"
-              >
+              <span v-else-if="user.locked"
+                class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400">
                 <span class="h-1.5 w-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
                 Verrouillé
               </span>
-              <span 
-                v-else
-                class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"
-              >
+              <span v-else
+                class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">
                 <span class="h-1.5 w-1.5 rounded-full bg-gray-600 dark:bg-gray-400"></span>
                 Inactif
               </span>
@@ -201,26 +200,19 @@
     </div>
 
     <!-- Modals -->
-    <UserModal 
-      v-if="showUserModal" 
-      :user-data="selectedUser" 
-      :is-view-mode="isViewMode"
-      @close="closeUserModal"
-      @success="handleUserSuccess" 
-    />
+    <UserModal v-if="showUserModal" :user-data="selectedUser" :is-view-mode="isViewMode" @close="closeUserModal"
+      @success="handleUserSuccess" />
 
-    <AssignRoleModal
-      v-if="showAssignRoleModal"
-      :user-data="selectedUser"
-      @close="closeAssignRoleModal"
-      @success="handleAssignRoleSuccess"
-    />
+    <AssignRoleModal v-if="showAssignRoleModal" :user-data="selectedUser" @close="closeAssignRoleModal"
+      @success="handleAssignRoleSuccess" />
 
-    <ImportUserCsvModal 
-      v-if="showImportModal" 
-      @close="showImportModal = false"
-      @import="handleImportCsv" 
-    />
+      <AssignEntityModal
+  v-if="showAssignEntityModal"
+  @close="closeAssignEntityModal"
+  @success="handleAssignEntitySuccess"
+/>
+
+   <!--  <ImportUserCsvModal v-if="showImportModal" @close="showImportModal = false" @import="handleImportCsv" /> -->
   </div>
 </template>
 
@@ -229,21 +221,23 @@ import { ref, computed, onMounted } from 'vue'
 import { useUsers } from '@/composables/users/useUsers'
 import UserModal from './UserModal.vue'
 import AssignRoleModal from './AssignRoleModal.vue'
+import AssignEntityModal from './AssignEntityModal.vue'
 /* import ImportUserCsvModal from './ImportUserCsvModal.vue' */
 
-const { 
-  usersList, 
-  isLoading, 
-  fetchUsers, 
+const {
+  usersList,
+  isLoading,
+  fetchUsers,
   deleteUser,
-/*   importUsersCsv, */
-  exportUsersCsv 
+  /*   importUsersCsv, */
+  exportUsersCsv
 } = useUsers()
 
 const searchQuery = ref('')
 const showUserModal = ref(false)
 const showAssignRoleModal = ref(false)
 const showImportModal = ref(false)
+const showAssignEntityModal = ref(false)
 const selectedUser = ref(null)
 const isViewMode = ref(false)
 
@@ -258,11 +252,11 @@ const filteredUsers = computed(() => {
     const username = (user.username || '').toLowerCase()
     const phone = (user.person?.phone || '').toLowerCase()
 
-    return firstname.includes(query) || 
-           lastname.includes(query) || 
-           email.includes(query) ||
-           username.includes(query) ||
-           phone.includes(query)
+    return firstname.includes(query) ||
+      lastname.includes(query) ||
+      email.includes(query) ||
+      username.includes(query) ||
+      phone.includes(query)
   })
 })
 
@@ -313,6 +307,15 @@ const handleAssignRoleSuccess = async () => {
   await fetchUsers()
 }
 
+const closeAssignEntityModal = () => {
+  showAssignEntityModal.value = false
+}
+
+const handleAssignEntitySuccess = async () => {
+  closeAssignEntityModal()
+  await fetchUsers()
+}
+
 const confirmDelete = (user) => {
   const fullName = `${user.person?.firstname} ${user.person?.lastname}`
   if (confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur "${fullName}" ?`)) {
@@ -330,23 +333,6 @@ const handleDelete = async (user) => {
   }
 }
 
-/* const handleImportCsv = async ({ file }) => {
-  try {
-    console.log('📤 Import utilisateurs, fichier:', file.name)
-    
-    const result = await importUsersCsv(file)
-
-    if (result.success) {
-      alert('Import réussi ! Utilisateurs importés avec succès.')
-      showImportModal.value = false
-    } else {
-      alert(result.error || 'Erreur lors de l\'import')
-    }
-  } catch (error) {
-    console.error('❌ Erreur import utilisateurs:', error)
-    alert('Erreur lors de l\'import du fichier')
-  }
-} */
 
 const handleExport = () => {
   try {

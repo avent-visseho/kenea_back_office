@@ -123,7 +123,7 @@ const router = createRouter({
       meta: {
         title: 'Ordonnance',
         requiresAuth: true,
-        /* allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'], */
+        /* allowedRoles: ['USER'], */
       },
     },{
       path: '/ordonnance-progression',

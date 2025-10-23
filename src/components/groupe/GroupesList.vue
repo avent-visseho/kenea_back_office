@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Groupes</h2>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gestion des groupes d’affiliation</h2>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Organisez vos groupes et sous-groupes
         </p>

@@ -33,13 +33,9 @@ const addCities = (data) => {
 }
 
 const importCitiesCsv = (formData, paysId) => {
-  return callerService.Axios.post(
-    `${callerService.API_URL}cities/import/${paysId}`,
-    formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }
-  )
+  return callerService.Axios.post(`${callerService.API_URL}cities/import/${paysId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
 }
 
 const getCitiesList = (params = {}) => {
@@ -58,6 +54,33 @@ const deleteCities = (id) => {
   return callerService.Axios.delete(`${callerService.API_URL}cities/${id}`)
 }
 
+// ======== Regions ========
+const addRegions = (data) => {
+  return callerService.Axios.post(`${callerService.API_URL}regions`, data)
+}
+
+const importRegionsCsv = (formData, paysId) => {
+  return callerService.Axios.post(`${callerService.API_URL}regions/import/${paysId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+const getRegionsList = (params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}regions`, { params })
+}
+
+const getRegionsById = (id, params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}regions/${id}`, { params })
+}
+
+const updateRegions = (id, data) => {
+  return callerService.Axios.put(`${callerService.API_URL}regions/${id}`, data)
+}
+
+const deleteRegions = (id) => {
+  return callerService.Axios.delete(`${callerService.API_URL}regions/${id}`)
+}
+
 export const PaysVilleService = {
   // Pays
   addPays,
@@ -74,4 +97,12 @@ export const PaysVilleService = {
   getCitiesById,
   updateCities,
   deleteCities,
+
+  // Regions
+  addRegions,
+  importRegionsCsv,
+  getRegionsList,
+  getRegionsById,
+  updateRegions,
+  deleteRegions,
 }

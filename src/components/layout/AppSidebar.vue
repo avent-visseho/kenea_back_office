@@ -195,7 +195,7 @@ const menuGroups = [
         path: '/ordonnance',
       },{
         icon: CalenderIcon,
-        name: 'ordonnance-progression',
+        name: 'traitement',
         path: '/ordonnance-progression',
       },{
         icon: CalenderIcon,

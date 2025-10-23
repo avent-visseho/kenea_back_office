@@ -6,11 +6,11 @@
     <div class="flex flex-col gap-4 mb-4">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Pays et villes
+          Pays, Régions et Villes
         </h3>
 
         <div class="flex items-center gap-3">
-          <!-- ✅ Import pour PAYS : input file direct -->
+          <!-- ✅ Input files cachés pour PAYS -->
           <input v-if="activeTab === 'pays'" ref="fileInputPays" type="file" accept=".csv" class="hidden"
             @change="handlePaysFileSelect" />
 
@@ -55,7 +55,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            {{ activeTab === 'pays' ? 'Nouveau pays' : 'Nouvelle ville' }}
+            {{ getCreateButtonLabel }}
           </button>
         </div>
       </div>
@@ -69,27 +69,21 @@
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <input v-model="searchQuery" type="text"
-            :placeholder="activeTab === 'pays' ? 'Rechercher un pays...' : 'Rechercher une ville...'"
+          <input v-model="searchQuery" type="text" :placeholder="getSearchPlaceholder"
             class="w-full h-11 pl-10 pr-4 rounded-lg border border-gray-300 bg-white text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
         </div>
 
         <div class="border-b border-gray-200 dark:border-gray-800 sm:border-0">
           <nav class="flex gap-8" aria-label="Tabs">
-            <button @click="activeTab = 'pays'" :class="[
-              'pb-3 px-1 border-b-2 font-medium text-sm transition-colors',
-              activeTab === 'pays'
-                ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300',
-            ]">
+            <button @click="activeTab = 'pays'" :class="tabClass('pays')">
               Pays
             </button>
-            <button @click="activeTab = 'villes'" :class="[
-              'pb-3 px-1 border-b-2 font-medium text-sm transition-colors',
-              activeTab === 'villes'
-                ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300',
-            ]">
+
+            <button @click="activeTab = 'regions'" :class="tabClass('regions')">
+              Régions
+            </button>
+
+            <button @click="activeTab = 'villes'" :class="tabClass('villes')">
               Villes
             </button>
           </nav>
@@ -100,6 +94,7 @@
     <!-- Tab Content -->
     <div class="tab-content">
       <PaysList v-if="activeTab === 'pays'" :search-query="searchQuery" />
+      <RegionsList v-else-if="activeTab === 'regions'" :search-query="searchQuery" />
       <VillesList v-else-if="activeTab === 'villes'" :search-query="searchQuery" />
     </div>
 
@@ -112,20 +107,29 @@
     <VilleModal v-if="showVilleModal" :ville-data="editingVille" @close="closeVilleModal"
       @success="handleVilleSuccess" />
 
-    <!-- ✅ NOUVEAU: Modal d'import CSV pour les villes -->
-    <ImportCsvModal v-if="showImportCsvModal" :pays-list="paysList" @close="showImportCsvModal = false"
-      @import="handleVilleImport" />
+    <RegionModal v-if="showRegionModal" :region-data="editingRegion" @close="closeRegionModal"
+      @success="handleRegionSuccess" />
+
+    <!-- Modal d'import CSV pour les villes -->
+    <ImportCsvModal v-if="showImportCsvModal && activeTab === 'villes'" :pays-list="paysList" type="villes"
+      @close="showImportCsvModal = false" @import="handleVilleImport" />
+
+    <!-- Modal d'import CSV pour les régions -->
+    <ImportCsvModal v-if="showImportCsvModal && activeTab === 'regions'" :pays-list="paysList" type="regions"
+      @close="showImportCsvModal = false" @import="handleRegionImport" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { usePaysVille } from '@/composables/pays_ville/usePaysVille'
 import PaysList from './PaysList.vue'
 import VillesList from './VillesList.vue'
+import RegionsList from './RegionsList.vue'
 import FilterModal from './FilterModal.vue'
 import PaysModal from './PaysModal.vue'
 import VilleModal from './VilleModal.vue'
+import RegionModal from './RegionModal.vue'
 import ImportCsvModal from './ImportCsvModal.vue'
 
 const activeTab = ref('pays')
@@ -133,9 +137,11 @@ const searchQuery = ref('')
 const showFilterModal = ref(false)
 const showPaysModal = ref(false)
 const showVilleModal = ref(false)
-const showImportCsvModal = ref(false) // ✅ NOUVEAU
+const showRegionModal = ref(false)
+const showImportCsvModal = ref(false)
 const editingPays = ref(null)
 const editingVille = ref(null)
+const editingRegion = ref(null)
 
 const fileInputPays = ref(null)
 
@@ -144,13 +150,55 @@ const {
   importPaysCsv,
   exportPaysCsv,
   importCitiesCsv,
-  exportCitiesCsv
+  exportCitiesCsv,
+  importRegionsCsv,
+  exportRegionsCsv
 } = usePaysVille()
+
+// ✅ Computed properties pour le texte dynamique
+const getCreateButtonLabel = computed(() => {
+  switch (activeTab.value) {
+    case 'pays':
+      return 'Nouveau pays'
+    case 'regions':
+      return 'Nouvelle région'
+    case 'villes':
+      return 'Nouvelle ville'
+    default:
+      return 'Nouveau'
+  }
+})
+
+const getSearchPlaceholder = computed(() => {
+  switch (activeTab.value) {
+    case 'pays':
+      return 'Rechercher un pays...'
+    case 'regions':
+      return 'Rechercher une région...'
+    case 'villes':
+      return 'Rechercher une ville...'
+    default:
+      return 'Rechercher...'
+  }
+})
+
+// ✅ Fonction pour les classes CSS des tabs
+const tabClass = (tab) => {
+  return [
+    'pb-3 px-1 border-b-2 font-medium text-sm transition-colors',
+    activeTab.value === tab
+      ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300',
+  ]
+}
 
 const openCreateModal = () => {
   if (activeTab.value === 'pays') {
     editingPays.value = null
     showPaysModal.value = true
+  } else if (activeTab.value === 'regions') {
+    editingRegion.value = null
+    showRegionModal.value = true
   } else {
     editingVille.value = null
     showVilleModal.value = true
@@ -167,6 +215,11 @@ const closeVilleModal = () => {
   editingVille.value = null
 }
 
+const closeRegionModal = () => {
+  showRegionModal.value = false
+  editingRegion.value = null
+}
+
 const handlePaysSuccess = () => {
   closePaysModal()
 }
@@ -175,18 +228,22 @@ const handleVilleSuccess = () => {
   closeVilleModal()
 }
 
+const handleRegionSuccess = () => {
+  closeRegionModal()
+}
+
 const applyFilters = (filters) => {
   console.log('Filtres appliqués:', filters)
   showFilterModal.value = false
 }
 
-// ✅ NOUVEAU: Gestion du clic sur Import
+// ✅ Gestion du clic sur Import
 const handleImportClick = () => {
   if (activeTab.value === 'pays') {
     // Pour les pays : sélection directe du fichier
     fileInputPays.value?.click()
   } else {
-    // Pour les villes : ouvrir le modal
+    // Pour les villes et régions : ouvrir le modal
     showImportCsvModal.value = true
   }
 }
@@ -219,7 +276,7 @@ const handlePaysFileSelect = async (event) => {
   }
 }
 
-// ✅ NOUVEAU: Import VILLES (avec modal)
+// ✅ Import VILLES (avec modal)
 const handleVilleImport = async ({ paysId, file }) => {
   try {
     console.log('Import villes pour pays:', paysId, 'fichier:', file.name)
@@ -238,12 +295,33 @@ const handleVilleImport = async ({ paysId, file }) => {
   }
 }
 
-// Export (inchangé)
+// ✅ Import REGIONS (avec modal)
+const handleRegionImport = async ({ paysId, file }) => {
+  try {
+    console.log('Import régions pour pays:', paysId, 'fichier:', file.name)
+
+    const result = await importRegionsCsv(file, paysId)
+
+    if (result.success) {
+      alert('Import réussi ! Régions importées avec succès.')
+      showImportCsvModal.value = false
+    } else {
+      alert(result.error || 'Erreur lors de l\'import')
+    }
+  } catch (error) {
+    console.error('Erreur import régions:', error)
+    alert('Erreur lors de l\'import du fichier')
+  }
+}
+
+// ✅ Export (gère les 3 types)
 const handleExport = () => {
   try {
     let result
     if (activeTab.value === 'pays') {
       result = exportPaysCsv()
+    } else if (activeTab.value === 'regions') {
+      result = exportRegionsCsv()
     } else {
       result = exportCitiesCsv()
     }

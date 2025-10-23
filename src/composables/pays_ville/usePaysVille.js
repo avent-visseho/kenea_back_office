@@ -5,6 +5,7 @@ import { PaysVilleService } from '../../api/services/pays_ville'
 // État partagé entre toutes les instances du composable
 const paysList = ref([])
 const citiesList = ref([])
+const regionsList = ref([])
 const isLoading = ref(false)
 const error = ref(null)
 
@@ -39,11 +40,9 @@ export function usePaysVille() {
     try {
       const response = await PaysVilleService.addPays(paysData)
       if (response.data.status === 'SUCCESS') {
-        // Ajouter directement le nouveau pays à la liste
         if (response.data.body) {
           paysList.value.push(response.data.body)
         } else {
-          // Fallback: recharger si le body n'est pas disponible
           await fetchPaysList()
         }
         return { success: true, data: response.data.body }
@@ -68,7 +67,6 @@ export function usePaysVille() {
 
       const response = await PaysVilleService.importPaysCsv(formData)
       if (response.data.status === 'SUCCESS') {
-        // Recharger la liste après l'import
         await fetchPaysList()
         return { success: true, data: response.data.body }
       }
@@ -82,26 +80,21 @@ export function usePaysVille() {
     }
   }
 
-  // ✅ NOUVEAU: Export CSV pour Pays
   const exportPaysCsv = () => {
     try {
-      // Créer les headers CSV
       const headers = ['Nom', 'Code', 'Indicatif']
 
-      // Créer les lignes de données
       const rows = paysList.value.map((pays) => [
         pays.nom || pays.name || '',
         pays.code || '',
         pays.indicatif || '',
       ])
 
-      // Combiner headers et rows
       const csvContent = [
         headers.join(','),
         ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
       ].join('\n')
 
-      // Créer un blob et déclencher le téléchargement
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
@@ -128,12 +121,10 @@ export function usePaysVille() {
     try {
       const response = await PaysVilleService.updatePays(id, paysData)
       if (response.data.status === 'SUCCESS') {
-        // Mettre à jour directement dans la liste
         const index = paysList.value.findIndex((p) => p.id === id || p.code === id)
         if (index !== -1 && response.data.body) {
           paysList.value[index] = response.data.body
         } else {
-          // Fallback: recharger si pas trouvé
           await fetchPaysList()
         }
         return { success: true, data: response.data.body }
@@ -155,7 +146,6 @@ export function usePaysVille() {
     try {
       const response = await PaysVilleService.deletePays(id)
       if (response.data.status === 'SUCCESS') {
-        // Supprimer directement de la liste
         paysList.value = paysList.value.filter((p) => p.id !== id && p.code !== id)
         return { success: true }
       }
@@ -197,7 +187,6 @@ export function usePaysVille() {
     try {
       const response = await PaysVilleService.addCities(citiesData)
       if (response.data.status === 'SUCCESS') {
-        // Ajouter directement la nouvelle ville à la liste
         if (response.data.body) {
           citiesList.value.push(response.data.body)
         } else {
@@ -222,8 +211,6 @@ export function usePaysVille() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      // Optionnel : si le backend attend aussi le paysId dans le FormData
-      // formData.append('paysId', paysId)
 
       const response = await PaysVilleService.importCitiesCsv(formData, paysId)
       if (response.data.status === 'SUCCESS') {
@@ -240,7 +227,6 @@ export function usePaysVille() {
     }
   }
 
-  // ✅ NOUVEAU: Export CSV pour Villes
   const exportCitiesCsv = () => {
     try {
       const headers = ['Nom', 'Pays']
@@ -282,7 +268,6 @@ export function usePaysVille() {
     try {
       const response = await PaysVilleService.updateCities(id, citiesData)
       if (response.data.status === 'SUCCESS') {
-        // Mettre à jour directement dans la liste
         const index = citiesList.value.findIndex((c) => c.id === id || c.code === id)
         if (index !== -1 && response.data.body) {
           citiesList.value[index] = response.data.body
@@ -308,7 +293,6 @@ export function usePaysVille() {
     try {
       const response = await PaysVilleService.deleteCities(id)
       if (response.data.status === 'SUCCESS') {
-        // Supprimer directement de la liste
         citiesList.value = citiesList.value.filter((c) => c.id !== id && c.code !== id)
         return { success: true }
       }
@@ -322,12 +306,162 @@ export function usePaysVille() {
     }
   }
 
+  // ============= REGIONS =============
+  const fetchRegionsList = async (deleted = false) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await PaysVilleService.getRegionsList({ deleted })
+      if (response.data.status === 'SUCCESS') {
+        regionsList.value = response.data.body || []
+        console.log('regionsList.value', regionsList.value)
+        return { success: true, data: regionsList.value }
+      }
+      return { success: false, error: 'Erreur lors du chargement des régions' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors du chargement des régions'
+      console.error('Erreur fetchRegionsList:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // ✅ FIX: Utiliser addRegions au lieu de addCities
+  const createRegions = async (regionsData) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await PaysVilleService.addRegions(regionsData)
+      if (response.data.status === 'SUCCESS') {
+        if (response.data.body) {
+          regionsList.value.push(response.data.body)
+        } else {
+          await fetchRegionsList()
+        }
+        return { success: true, data: response.data.body }
+      }
+      return { success: false, error: 'Erreur lors de la création de la région' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors de la création de la région'
+      console.error('Erreur createRegions:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const importRegionsCsv = async (file, paysId) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await PaysVilleService.importRegionsCsv(formData, paysId)
+      if (response.data.status === 'SUCCESS') {
+        await fetchRegionsList()
+        return { success: true, data: response.data.body }
+      }
+      return { success: false, error: "Erreur lors de l'import du fichier CSV" }
+    } catch (err) {
+      error.value = err.response?.data?.message || "Erreur lors de l'import du fichier CSV"
+      console.error('Erreur importRegionsCsv:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const exportRegionsCsv = () => {
+    try {
+      const headers = ['Nom', 'Pays']
+
+      const rows = regionsList.value.map((region) => {
+        const paysNom =
+          paysList.value.find((p) => p.id === (region.paysId || region.pays_id))?.nom || '-'
+        return [region.nom || region.name || '', paysNom]
+      })
+
+      const csvContent = [
+        headers.join(','),
+        ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+      ].join('\n')
+
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+
+      link.setAttribute('href', url)
+      link.setAttribute('download', `regions_${new Date().toISOString().slice(0, 10)}.csv`)
+      link.style.visibility = 'hidden'
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      return { success: true }
+    } catch (err) {
+      console.error('Erreur exportRegionsCsv:', err)
+      return { success: false, error: "Erreur lors de l'export CSV" }
+    }
+  }
+
+  const updateRegions = async (id, regionsData) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await PaysVilleService.updateRegions(id, regionsData)
+      if (response.data.status === 'SUCCESS') {
+        const index = regionsList.value.findIndex((p) => p.id === id || p.code === id)
+        if (index !== -1 && response.data.body) {
+          regionsList.value[index] = response.data.body
+        } else {
+          await fetchRegionsList()
+        }
+        return { success: true, data: response.data.body }
+      }
+      return { success: false, error: 'Erreur lors de la modification de la Region' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors de la modification de la Region'
+      console.error('Erreur updateRegions:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const deleteRegions = async (id) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await PaysVilleService.deleteRegions(id)
+      if (response.data.status === 'SUCCESS') {
+        regionsList.value = regionsList.value.filter((r) => r.id !== id && r.code !== id)
+        return { success: true }
+      }
+      return { success: false, error: 'Erreur lors de la suppression de la région' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors de la suppression de la région'
+      console.error('Erreur deleteRegions:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     // État partagé
     isLoading,
     error,
     paysList,
     citiesList,
+    regionsList,
 
     // Méthodes Pays
     fetchPaysList,
@@ -344,5 +478,19 @@ export function usePaysVille() {
     exportCitiesCsv,
     updateCities,
     deleteCities,
+
+    // Méthodes Régions
+    fetchRegionsList,
+    createRegions,
+    importRegionsCsv,
+    exportRegionsCsv,
+    updateRegions,
+    deleteRegions,
   }
 }
+
+// Correction RegionsList.vue - getPaysName
+// Ligne 49 : remplacer
+// {{ getPaysName(region.name || region.name) }}
+// par
+// {{ getPaysName(region.paysId || region.pays_id) }}

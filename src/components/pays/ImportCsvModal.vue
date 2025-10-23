@@ -7,7 +7,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Importer des villes (CSV)
+          {{ modalTitle }}
         </h3>
         <button @click="$emit('close')"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
@@ -40,16 +40,18 @@
         <!-- Info -->
         <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <div class="flex gap-3">
-            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none"
-              stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div class="text-sm text-blue-800 dark:text-blue-200">
               <p class="font-medium mb-1">Format du fichier CSV attendu :</p>
               <ul class="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
-                <li>Header : <code class="px-1 py-0.5 bg-blue-100 dark:bg-blue-900/40 rounded">nom</code></li>
-                <li>Exemple : <code class="px-1 py-0.5 bg-blue-100 dark:bg-blue-900/40 rounded">Paris</code></li>
+                <li>Header : <code class="px-1 py-0.5 bg-blue-100 dark:bg-blue-900/40 rounded">nom</code> ou <code
+                    class="px-1 py-0.5 bg-blue-100 dark:bg-blue-900/40 rounded">name</code></li>
+                <li>Exemple : <code class="px-1 py-0.5 bg-blue-100 dark:bg-blue-900/40 rounded">{{ exampleName }}</code>
+                </li>
                 <li>Le pays sera automatiquement associé</li>
               </ul>
             </div>
@@ -62,8 +64,8 @@
             Fichier CSV <span class="text-red-500">*</span>
           </label>
           <div class="relative">
-            <input ref="fileInput" type="file" accept=".csv" @change="handleFileChange"
-              class="hidden" :disabled="isUploading" />
+            <input ref="fileInput" type="file" accept=".csv" @change="handleFileChange" class="hidden"
+              :disabled="isUploading" />
 
             <button @click="triggerFileInput" :disabled="isUploading || !selectedPaysId"
               class="w-full px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 bg-gray-50 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -127,6 +129,11 @@ const props = defineProps({
   paysList: {
     type: Array,
     required: true
+  },
+  type: {
+    type: String,
+    default: 'villes', // 'villes' ou 'regions'
+    validator: (value) => ['villes', 'regions'].includes(value)
   }
 })
 
@@ -138,6 +145,18 @@ const selectedFile = ref(null)
 const showError = ref(false)
 const isUploading = ref(false)
 const uploadProgress = ref(0)
+
+// ✅ Titre dynamique selon le type
+const modalTitle = computed(() => {
+  return props.type === 'regions'
+    ? 'Importer des régions (CSV)'
+    : 'Importer des villes (CSV)'
+})
+
+// ✅ Exemple dynamique selon le type
+const exampleName = computed(() => {
+  return props.type === 'regions' ? 'Île-de-France' : 'Paris'
+})
 
 const canImport = computed(() => {
   return selectedPaysId.value && selectedFile.value
@@ -172,7 +191,7 @@ const handleImport = async () => {
   isUploading.value = true
   uploadProgress.value = 0
 
-  // Simulation de progression (à ajuster selon votre API)
+  // Simulation de progression
   const progressInterval = setInterval(() => {
     if (uploadProgress.value < 90) {
       uploadProgress.value += 10
@@ -184,10 +203,9 @@ const handleImport = async () => {
       paysId: selectedPaysId.value,
       file: selectedFile.value
     })
-    
+
     uploadProgress.value = 100
-    
-    // Fermer après un court délai
+
     setTimeout(() => {
       clearInterval(progressInterval)
       emit('close')

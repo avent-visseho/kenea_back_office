@@ -48,6 +48,35 @@ export const useAuthStore = defineStore('auth', {
       }
       return 'Utilisateur'
     },
+
+    // ✅ NOUVEAU: Getter pour récupérer l'ID de la pharmacie
+    pharmacieId: (state) => {
+      const assignments = state.user?.assignments
+      if (assignments && assignments.PHARMACIE && Array.isArray(assignments.PHARMACIE)) {
+        return assignments.PHARMACIE[0] || null
+      }
+      return null
+    },
+
+    // ✅ NOUVEAU: Getter pour tous les IDs de pharmacies (si plusieurs)
+    pharmacieIds: (state) => {
+      const assignments = state.user?.assignments
+      if (assignments && assignments.PHARMACIE && Array.isArray(assignments.PHARMACIE)) {
+        return assignments.PHARMACIE
+      }
+      return []
+    },
+
+    // ✅ NOUVEAU: Vérifier si l'utilisateur a une pharmacie assignée
+    hasPharmacie: (state) => {
+      const assignments = state.user?.assignments
+      return !!(assignments && assignments.PHARMACIE && assignments.PHARMACIE.length > 0)
+    },
+
+    // ✅ NOUVEAU: Récupérer toutes les assignations
+    userAssignments: (state) => {
+      return state.user?.assignments || {}
+    },
   },
 
   actions: {
@@ -164,7 +193,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // ✅ CORRECTION PRINCIPALE: Récupérer les infos utilisateur
+    // ✅ Récupérer les infos utilisateur
     async fetchUserInfo() {
       if (!this.token) return
 
@@ -172,10 +201,10 @@ export const useAuthStore = defineStore('auth', {
         const response = await getUserInfo()
         console.log('User info response:', response)
 
-        // ✅ CORRECTION: Les données sont dans response.body
         if (response?.status === 'SUCCESS' && response.body) {
           this.user = response.body
           console.log('✅ User info saved to store:', this.user)
+          console.log('✅ Pharmacie ID:', this.pharmacieId)
           this.saveToStorage()
         } else {
           console.error('❌ Invalid user info response:', response)
@@ -236,6 +265,7 @@ export const useAuthStore = defineStore('auth', {
             this.token = parsed.token
             this.isAuthenticated = parsed.isAuthenticated
             console.log('✅ User restored from storage:', this.user)
+            console.log('✅ Pharmacie ID:', this.pharmacieId)
             return true
           }
         }

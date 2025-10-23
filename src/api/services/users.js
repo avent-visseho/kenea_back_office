@@ -32,6 +32,14 @@ const assignRole = (userId, roleIds) => {
   )
 }
 
+
+const assignEntity = (payload) => {
+  return callerService.Axios.post(
+    `${callerService.API_URL}users/assignations/v2`,
+    payload
+  )
+}
+
 const updateUser = (id, data) => {
   return callerService.Axios.put(`${callerService.API_URL}users/${id}`, data)
 }
@@ -43,6 +51,7 @@ const deleteUser = (id) => {
 export const UsersServices = {
   getUsers,
   assignRole,
+  assignEntity,
   getUserById,
   getUsersByCityID,
   updateCoordonnees,

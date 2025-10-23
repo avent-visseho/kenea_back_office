@@ -1,3 +1,5 @@
+//src/api/services/ordonnanceProgression.js
+
 import { callerService } from './caller_service'
 
 const getAllProgressions = (deleted = false) => {
@@ -49,6 +51,10 @@ const traiterProgression = (ordonnanceId, items, userId) => {
     }
   )
 }
+/* ordonnance by pharmacie */
+const getOrdonnancesByPharmacie = (pharmacieId, params = {}) => {
+  return callerService.Axios.get(`${callerService.API_URL}inbox/pharmacie/${pharmacieId}`, { params })
+}
 
 export const OrdonnanceProgressionServices = {
   getAllProgressions,
@@ -57,5 +63,6 @@ export const OrdonnanceProgressionServices = {
   deleteProgression,
   restoreProgression,
   updateProgressionStatus,
-  traiterProgression
+  traiterProgression,
+  getOrdonnancesByPharmacie
 }

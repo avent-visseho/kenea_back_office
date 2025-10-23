@@ -1,3 +1,5 @@
+//src/views/ordonnance/OrdonnanceProgressionsView.vue
+
 <template>
   <admin-layout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />

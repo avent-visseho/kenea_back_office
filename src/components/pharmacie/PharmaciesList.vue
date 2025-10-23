@@ -11,23 +11,21 @@
 
         <div class="flex items-center gap-3">
           <!-- ✅ NOUVEAU: Bouton Import -->
-          <button
-            @click="showImportModal = true"
-            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-          >
+          <button @click="showImportModal = true"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             Importer CSV
           </button>
 
           <!-- ✅ NOUVEAU: Bouton Export -->
-          <button
-            @click="handleExport"
-            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-          >
+          <button @click="handleExport"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
             </svg>
             Exporter CSV
           </button>
@@ -52,7 +50,8 @@
 
           <button @click="openCreateModal"
             class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600 shadow-theme-xs">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Nouvelle pharmacie
           </button>
@@ -138,14 +137,14 @@
             </td>
             <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-               
-                   {{ pharmacie.region || pharmacie.region || 'N/A' }}
+
+                {{ pharmacie.region || pharmacie.region || 'N/A' }}
               </p>
             </td>
             <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-               <!--  {{ getVilleName(pharmacie.ville || pharmacie.ville) }} -->
-                   {{ pharmacie.ville || pharmacie.ville || 'N/A' }}
+                <!--  {{ getVilleName(pharmacie.ville || pharmacie.ville) }} -->
+                {{ pharmacie.ville || pharmacie.ville || 'N/A' }}
               </p>
             </td>
             <td class="py-3 whitespace-nowrap">
@@ -155,11 +154,11 @@
             </td>
             <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                   {{ pharmacie.nameGerant || pharmacie.nameGerant || 'N/A' }}
-                   {{ pharmacie.prenomGerant || pharmacie.prenomGerant || 'N/A' }}
+                {{ pharmacie.nameGerant || pharmacie.nameGerant || 'N/A' }}
+                {{ pharmacie.prenomGerant || pharmacie.prenomGerant || 'N/A' }}
               </p>
             </td>
-            
+
             <td class="py-3 whitespace-nowrap">
               <span :class="[
                 'rounded-full px-2 py-0.5 text-theme-xs font-medium',
@@ -210,12 +209,7 @@
       @success="handlePharmacieSuccess" />
 
     <!-- ✅ NOUVEAU: Modal d'import CSV -->
-    <ImportPharmaciesCsvModal 
-      v-if="showImportModal" 
-      :cities-list="citiesList"
-      @close="showImportModal = false"
-      @import="handleImportCsv" 
-    />
+    <ImportPharmaciesCsvModal v-if="showImportModal" @close="showImportModal = false" @import="handleImportCsv" />
 
     <!-- <FilterModal v-if="showFilterModal" @close="showFilterModal = false" @apply="applyFilters" /> -->
   </div>
@@ -228,10 +222,10 @@ import { usePaysVille } from '@/composables/pays_ville/usePaysVille'
 import PharmacieModal from './PharmacieModal.vue'
 import ImportPharmaciesCsvModal from './ImportPharmaciesCsvModal.vue' // ✅ NOUVEAU
 
-const { 
-  pharmaciesList, 
-  isLoading, 
-  fetchPharmaciesList, 
+const {
+  pharmaciesList,
+  isLoading,
+  fetchPharmaciesList,
   deletePharmacies,
   importPharmaciesCsv,  // ✅ NOUVEAU
   exportPharmaciesCsv   // ✅ NOUVEAU
@@ -308,8 +302,8 @@ const handleDelete = async (pharmacie) => {
 // ✅ NOUVEAU: Gestion de l'import CSV
 const handleImportCsv = async ({ villeId, file }) => {
   try {
-    console.log('📤 Import pharmacies pour ville:', villeId, 'fichier:', file.name)
-    
+    /* console.log('📤 Import pharmacies pour ville:', villeId, 'fichier:', file.name)
+ */
     const result = await importPharmaciesCsv(file, villeId)
 
     if (result.success) {
