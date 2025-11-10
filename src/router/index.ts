@@ -10,7 +10,21 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/dashboard',
+      name: 'home',
+      component: () => import('../views/marketplace/Home.vue'),
+      meta: {
+        title: 'Accueil - Marketplace',
+        requiresAuth: false,
+      },
+    },
+    {
+      path: '/pharmacie/:id',
+      name: 'pharmacy-details',
+      component: () => import('../views/marketplace/PharmacyDetails.vue'),
+      meta: {
+        title: 'Détails de la pharmacie',
+        requiresAuth: false,
+      },
     },
     {
       path: '/dashboard',
@@ -99,7 +113,7 @@ const router = createRouter({
       meta: {
         title: 'Inbox',
         requiresAuth: true,
-        allowedRoles: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+        allowedRoles: ['USER'],
       },
     },
     {
@@ -139,7 +153,7 @@ const router = createRouter({
       meta: {
         title: 'Ordonnance Progression',
         requiresAuth: true,
-        allowedRoles: ['PHARMACIE', 'ADMIN', 'SUPER_ADMIN'],
+        allowedRoles: ['PHARMACIE'],
       },
     },
     {

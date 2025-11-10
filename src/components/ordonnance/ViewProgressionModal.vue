@@ -43,7 +43,7 @@
               <div class="flex items-center gap-2">
                 <span :class="getStatusClass(progression.statut)"
                   class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
-                  <span class="h-2 w-2 rounded-full" :class="getStatusDotClass(progression.statut)"></span>
+                  <span class="h-2 w-2 rounded-full" :class="getStatFCFAotClass(progression.statut)"></span>
                   {{ getStatusLabel(progression.statut) }}
                 </span>
               </div>
@@ -147,7 +147,7 @@ const getStatusClass = (status) => {
   return classes[status] || 'bg-gray-100 text-gray-700'
 }
 
-const getStatusDotClass = (status) => {
+const getStatFCFAotClass = (status) => {
   const classes = {
     'PENDING': 'bg-amber-500',
     'COMPLETED': 'bg-emerald-500',

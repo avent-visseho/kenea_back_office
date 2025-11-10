@@ -62,7 +62,7 @@
                   :class="getStatusClass(ordonnance?.etat)"
                   class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
                 >
-                  <span class="h-1.5 w-1.5 rounded-full" :class="getStatusDotClass(ordonnance?.etat)"></span>
+                  <span class="h-1.5 w-1.5 rounded-full" :class="getStatFCFAotClass(ordonnance?.etat)"></span>
                   {{ getStatusLabel(ordonnance?.etat) }}
                 </span>
               </div>
@@ -221,7 +221,7 @@ const getStatusClass = (status) => {
   return classes[status] || 'bg-gray-100 text-gray-700'
 }
 
-const getStatusDotClass = (status) => {
+const getStatFCFAotClass = (status) => {
   const classes = {
     'PENDING': 'bg-amber-500',
     'VALIDATED': 'bg-emerald-500',

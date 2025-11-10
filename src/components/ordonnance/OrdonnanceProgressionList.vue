@@ -112,7 +112,7 @@
             <td class="py-3 whitespace-nowrap">
               <span :class="getStatusClass(ordonnance.statut)"
                 class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
-                <span class="h-1.5 w-1.5 rounded-full" :class="getStatusDotClass(ordonnance.statut)"></span>
+                <span class="h-1.5 w-1.5 rounded-full" :class="getStatFCFAotClass(ordonnance.statut)"></span>
                 {{ getStatusLabel(ordonnance.statut) }}
               </span>
             </td>
@@ -254,7 +254,7 @@ const getStatusClass = (status) => {
   return classes[status] || 'bg-gray-100 text-gray-700'
 }
 
-const getStatusDotClass = (status) => {
+const getStatFCFAotClass = (status) => {
   const classes = {
     'PENDING': 'bg-amber-500',
     'COMPLETED': 'bg-emerald-500',
