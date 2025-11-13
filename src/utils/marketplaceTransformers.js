@@ -211,7 +211,7 @@ export const transformProductData = (apiProduct, apiHost = '') => {
     code: apiProduct.code,
     produitId: apiProduct.produitId,
     pharmacieId: apiProduct.pharmacieId,
-    nom: apiProduct.produitName || apiProduct.produit || 'Produit',
+    nom: apiProduct.nomProduit || apiProduct.produit || 'Produit',
     categorie: 'Médicament', // Catégorie par défaut (à enrichir si l'API fournit)
     prix: apiProduct.prix,
     prixFinal,

@@ -133,6 +133,18 @@
         <div class="space-y-4">
           <h4 class="font-semibold text-gray-900 dark:text-white">Informations de contact</h4>
 
+          <!-- Message si utilisateur connecté -->
+          <div v-if="authStore.isAuthenticated" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <p class="text-sm text-green-800 dark:text-green-300">
+                Connecté en tant que <strong>{{ authStore.displayName }}</strong>
+              </p>
+            </div>
+          </div>
+
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
@@ -140,6 +152,8 @@
                 v-model="form.nom"
                 type="text"
                 required
+                :disabled="authStore.isAuthenticated && form.nom"
+                :class="authStore.isAuthenticated && form.nom ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''"
                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-gray-700 dark:text-white"
                 placeholder="Votre nom"
               />
@@ -151,6 +165,8 @@
                 v-model="form.prenom"
                 type="text"
                 required
+                :disabled="authStore.isAuthenticated && form.prenom"
+                :class="authStore.isAuthenticated && form.prenom ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''"
                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-gray-700 dark:text-white"
                 placeholder="Votre prénom"
               />
@@ -168,6 +184,18 @@
               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-gray-700 dark:text-white"
               placeholder="+243 81 234 5678"
             />
+          </div>
+
+          <!-- Message d'information si non connecté -->
+          <div v-if="!authStore.isAuthenticated" class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-sm text-blue-800 dark:text-blue-300">
+                Connectez-vous pour pré-remplir automatiquement vos informations
+              </p>
+            </div>
           </div>
         </div>
 
@@ -219,9 +247,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCart } from '@/composables/marketPlace/useCart'
 import { useCartStore } from '@/store/cart/cartStore'
+import { useAuthStore } from '@/store/auth/auth'
 import OrdonnancePreviewModal from './OrdonnancePreviewModal.vue'
 
 const props = defineProps({
@@ -244,6 +274,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['order-submitted'])
+
+// Router et stores
+const router = useRouter()
+const authStore = useAuthStore()
 
 // Composables
 const {
@@ -269,6 +303,18 @@ const form = ref({
 })
 
 const fileInput = ref(null)
+
+// Au montage du composant, pré-remplir les champs si l'utilisateur est connecté
+onMounted(() => {
+  if (authStore.isAuthenticated && authStore.userPerson) {
+    form.value.nom = authStore.userPerson.lastname || ''
+    form.value.prenom = authStore.userPerson.firstname || ''
+    console.log('👤 Utilisateur connecté - Champs pré-remplis:', {
+      nom: form.value.nom,
+      prenom: form.value.prenom
+    })
+  }
+})
 
 // Synchroniser les produits sélectionnés avec le store
 watch(() => props.selectedProducts, (newProducts) => {
@@ -332,7 +378,32 @@ const removeOrdonnance = () => {
  * Soumet la commande
  */
 const handleSubmit = async () => {
+  // Empêcher les double-clics
+  if (submittingOrder.value) {
+    console.log('⏳ Commande déjà en cours...')
+    return
+  }
+
   clearError()
+
+  // ✅ Vérifier si l'utilisateur est connecté
+  if (!authStore.isAuthenticated) {
+    console.log('🔒 Utilisateur non connecté - Redirection vers la page de connexion')
+
+    // Sauvegarder l'URL actuelle pour rediriger après connexion
+    const currentRoute = router.currentRoute.value
+
+    // Rediriger vers la page de connexion avec l'URL de retour
+    router.push({
+      path: '/signin',
+      query: {
+        redirect: currentRoute.fullPath
+      }
+    })
+
+    error.value = 'Veuillez vous connecter pour passer commande'
+    return
+  }
 
   // Valider le formulaire
   if (!form.value.nom || !form.value.prenom || !form.value.telWathsApp) {

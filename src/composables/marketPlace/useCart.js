@@ -173,6 +173,8 @@ export function useCart() {
       // Étape 1 : Créer le panier
       const createResponse = await MarketPlaceService.createPanier(panierData)
 
+      console.log('📥 Réponse complète du serveur (createPanier):', createResponse.data)
+
       if (createResponse.data?.status === 'SUCCESS' && createResponse.data.body) {
         const panierCreated = createResponse.data.body
         console.log('✅ Panier créé avec succès:', panierCreated)
@@ -181,10 +183,16 @@ export function useCart() {
         const submitData = {
           panierId: panierCreated.id,
           lignePanierDto: panierCreated.lignePanierDto,
-          total: panierCreated.total
+          total: panierCreated.total,
+          imageOrdonnance: cartStore.ordonnanceData || '' // Image de l'ordonnance en base64
         }
 
-        console.log('📤 Étape 2/2 : Soumission du panier à la pharmacie...', submitData)
+        console.log('📤 Étape 2/2 : Soumission du panier à la pharmacie...', {
+          panierId: submitData.panierId,
+          produits: submitData.lignePanierDto.length,
+          total: submitData.total,
+          hasOrdonnance: !!submitData.imageOrdonnance
+        })
 
         // Étape 3 : Soumettre à la pharmacie
         const submitResponse = await MarketPlaceService.submitPanierToPharmacy(submitData)
@@ -200,12 +208,22 @@ export function useCart() {
           throw new Error('Erreur lors de la soumission à la pharmacie')
         }
       } else {
+        console.error('❌ Réponse invalide:', {
+          status: createResponse.data?.status,
+          hasBody: !!createResponse.data?.body,
+          data: createResponse.data
+        })
         throw new Error('Réponse invalide du serveur lors de la création du panier')
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'Erreur lors de la soumission de la commande'
       error.value = errorMessage
       console.error('❌ Erreur soumission commande:', err)
+      console.error('❌ Détails de l\'erreur:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      })
       return null
     } finally {
       submittingOrder.value = false

@@ -107,12 +107,25 @@ export const useAuth = () => {
     try {
       const result = await authStore.login(credentials)
       if (result.success && result.requiresOtp) {
-        await router.push('/verify-otp')
+        // Conserver le paramètre redirect lors de la redirection vers OTP
+        const redirectUrl = router.currentRoute.value.query.redirect
+        if (redirectUrl) {
+          await router.push({ path: '/verify-otp', query: { redirect: redirectUrl } })
+        } else {
+          await router.push('/verify-otp')
+        }
         return result
       }
       if (result.success && !result.requiresOtp) {
-        // Rediriger vers la page appropriée selon le rôle
-        await router.push(getHomeRoute())
+        // Vérifier s'il y a une URL de redirection
+        const redirectUrl = router.currentRoute.value.query.redirect
+        if (redirectUrl) {
+          console.log('🔄 Redirection vers:', redirectUrl)
+          await router.push(redirectUrl)
+        } else {
+          // Rediriger vers la page appropriée selon le rôle
+          await router.push(getHomeRoute())
+        }
         return result
       }
       throw new Error(result.error || 'Erreur de connexion')
@@ -127,8 +140,17 @@ export const useAuth = () => {
     try {
       const result = await authStore.verifyOtp(otp)
       if (result.success) {
-        // Rediriger vers la page appropriée selon le rôle
-        await router.push(getHomeRoute())
+        // Vérifier s'il y a une URL de redirection
+        const redirectUrl = router.currentRoute.value.query.redirect
+
+        if (redirectUrl) {
+          // Rediriger vers l'URL demandée
+          console.log('🔄 Redirection vers:', redirectUrl)
+          await router.push(redirectUrl)
+        } else {
+          // Rediriger vers la page appropriée selon le rôle
+          await router.push(getHomeRoute())
+        }
         return result
       }
       throw new Error(result.error || 'Code OTP invalide')

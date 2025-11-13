@@ -1,6 +1,8 @@
 // src/store/cart/cartStore.js
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+
+const CART_STORAGE_KEY = 'kenea_marketplace_cart'
 
 export const useCartStore = defineStore('cart', () => {
   // === État ===
@@ -14,6 +16,60 @@ export const useCartStore = defineStore('cart', () => {
     prenom: '',
     telWathsApp: ''
   })
+
+  // === Persistence ===
+
+  /**
+   * Sauvegarde le panier dans localStorage
+   */
+  const saveToStorage = () => {
+    try {
+      const cartData = {
+        items: items.value,
+        pharmacyId: pharmacyId.value,
+        pharmacyName: pharmacyName.value,
+        ordonnanceId: ordonnanceId.value,
+        ordonnanceData: ordonnanceData.value,
+        customerInfo: customerInfo.value
+      }
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData))
+      console.log('💾 Panier sauvegardé dans le localStorage')
+    } catch (error) {
+      console.error('❌ Erreur lors de la sauvegarde du panier:', error)
+    }
+  }
+
+  /**
+   * Charge le panier depuis localStorage
+   */
+  const loadFromStorage = () => {
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY)
+      if (savedCart) {
+        const cartData = JSON.parse(savedCart)
+        items.value = cartData.items || []
+        pharmacyId.value = cartData.pharmacyId || null
+        pharmacyName.value = cartData.pharmacyName || ''
+        ordonnanceId.value = cartData.ordonnanceId || null
+        ordonnanceData.value = cartData.ordonnanceData || null
+        customerInfo.value = cartData.customerInfo || { nom: '', prenom: '', telWathsApp: '' }
+        console.log('✅ Panier chargé depuis le localStorage:', items.value.length, 'article(s)')
+        return true
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement du panier:', error)
+    }
+    return false
+  }
+
+  // Watcher pour sauvegarder automatiquement à chaque modification
+  watch(
+    [items, pharmacyId, pharmacyName, ordonnanceId, ordonnanceData, customerInfo],
+    () => {
+      saveToStorage()
+    },
+    { deep: true }
+  )
 
   // === Computed ===
 
@@ -158,6 +214,8 @@ export const useCartStore = defineStore('cart', () => {
       prenom: '',
       telWathsApp: ''
     }
+    // Supprimer aussi du localStorage
+    localStorage.removeItem(CART_STORAGE_KEY)
     console.log('🛒 Panier vidé')
   }
 
@@ -175,14 +233,17 @@ export const useCartStore = defineStore('cart', () => {
         sousTotal: item.sousTotal
       })),
       pharmacieId: pharmacyId.value,
-      livreurId: '', // À définir si nécessaire
-      ordonnanceId: ordonnanceId.value || '',
+      livreurId: null, // null au lieu de '' pour éviter l'erreur "No value present"
+      ordonnanceId: ordonnanceId.value || null, // null au lieu de '' si pas d'ordonnance
       total: total.value,
       nom: customerInfo.value.nom,
       prenom: customerInfo.value.prenom,
       telWathsApp: customerInfo.value.telWathsApp
     }
   }
+
+  // Charger le panier au démarrage
+  loadFromStorage()
 
   return {
     // État
@@ -208,6 +269,10 @@ export const useCartStore = defineStore('cart', () => {
     clearOrdonnance,
     setCustomerInfo,
     clearCart,
-    getPanierData
+    getPanierData,
+
+    // Persistence
+    loadFromStorage,
+    saveToStorage
   }
 })

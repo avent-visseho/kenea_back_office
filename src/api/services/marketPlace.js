@@ -59,7 +59,7 @@ const createPanier = (panierData) => {
 // ✅ Soumettre le panier à la pharmacie
 const submitPanierToPharmacy = (panierSubmitData) => {
   return callerService.Axios.post(
-    `${callerService.API_URL}market-places/submit-panier-to-pharmacienewv`,
+    `${callerService.API_URL}market-places/submit-panier-to-pharmacie`,
     panierSubmitData
   )
 }
