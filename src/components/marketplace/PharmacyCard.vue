@@ -1,7 +1,7 @@
 <template>
   <div
     class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-    @click="$emit('click', pharmacy.id)"
+    @click="$emit('click', pharmacy)"
   >
     <!-- Image de couverture -->
     <div class="relative h-48 overflow-hidden">
@@ -102,7 +102,7 @@
       <!-- Bouton d'action -->
       <button
         class="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-        @click.stop="$emit('click', pharmacy.id)"
+        @click.stop="$emit('click', pharmacy)"
       >
         <span>Voir les produits</span>
         <svg

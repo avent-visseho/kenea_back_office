@@ -1,4 +1,4 @@
-// Données statiques pour les pharmacies
+/* // Données statiques pour les pharmacies
 export const mockPharmacies = [
   {
     id: 1,
@@ -120,3 +120,4 @@ export const searchPharmacies = (query) => {
     pharmacy.services.some(service => service.toLowerCase().includes(lowerQuery))
   )
 }
+ */

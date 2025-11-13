@@ -1,4 +1,4 @@
-// Données statiques pour les produits pharmaceutiques
+/* // Données statiques pour les produits pharmaceutiques
 export const mockProducts = {
   1: [ // Produits de la Pharmacie de la Paix
     {
@@ -355,3 +355,4 @@ export const categories = [
   'Cosmétique',
   'Matériel médical'
 ]
+ */

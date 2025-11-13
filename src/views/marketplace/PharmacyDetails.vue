@@ -40,7 +40,40 @@
       </div>
     </header>
 
-    <div v-if="pharmacy" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- État de chargement -->
+    <div v-if="isLoading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+      <div class="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-brand-500 mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400 text-lg">Chargement de la pharmacie...</p>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div v-else-if="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-8">
+        <div class="text-center">
+          <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 class="text-2xl font-bold text-red-800 dark:text-red-300 mb-2">Erreur de chargement</h3>
+          <p class="text-red-700 dark:text-red-400 mb-6">{{ error }}</p>
+          <div class="flex gap-4 justify-center">
+            <button
+              @click="retryLoading"
+              class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Réessayer
+            </button>
+            <button
+              @click="goBack"
+              class="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-medium transition-colors"
+            >
+              Retour à l'accueil
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="pharmacy" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- En-tête de la pharmacie -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8">
         <!-- Image de couverture -->
@@ -169,8 +202,9 @@
             <OrderForm
               :selected-products="selectedProducts"
               :all-products="products"
-              @remove-product="removeProduct"
-              @submit-order="submitOrder"
+              :pharmacy-id="pharmacy?.id"
+              :pharmacy-name="pharmacy?.nom"
+              @order-submitted="handleOrderSubmitted"
             />
           </div>
         </div>
@@ -256,45 +290,106 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ProductList from '@/components/marketplace/ProductList.vue'
 import OrderForm from '@/components/marketplace/OrderForm.vue'
-import { getPharmacyById } from '@/data/mockPharmacies'
-import { getProductsByPharmacyId } from '@/data/mockProducts'
+import { useMarketPlace } from '@/composables/marketPlace/useMarketPlace'
+import { useCartStore } from '@/store/cart/cartStore'
 
 const route = useRoute()
 const router = useRouter()
 
-const pharmacy = ref(null)
-const products = ref([])
+// Utilisation du composable marketplace
+const {
+  products: pharmacyProducts,
+  isLoading,
+  error,
+  fetchPharmacyById,
+  fetchPharmacyInfoFromNearbyList
+} = useMarketPlace()
+
+// Store du panier
+const cartStore = useCartStore()
+
 const selectedProducts = ref([])
 const showSuccessModal = ref(false)
 
-onMounted(() => {
-  // Récupérer la pharmacie par ID
-  const pharmacyId = parseInt(route.params.id)
-  pharmacy.value = getPharmacyById(pharmacyId)
+// Récupérer l'objet pharmacie depuis le router state
+const pharmacy = ref(history.state.pharmacy || null)
 
-  // Récupérer les produits de cette pharmacie
-  if (pharmacy.value) {
-    products.value = getProductsByPharmacyId(pharmacyId)
+// Computed pour simplifier l'accès aux produits
+const products = computed(() => pharmacyProducts.value)
+
+// Chargement initial des produits et infos de la pharmacie
+onMounted(async () => {
+  const pharmacyId = route.params.id
+
+  // Si on n'a pas l'objet pharmacie (accès direct par URL), essayer de le récupérer
+  if (!pharmacy.value && pharmacyId) {
+    console.warn('⚠️ Objet pharmacie non disponible, chargement depuis l\'API...')
+    try {
+      const pharmacyInfo = await fetchPharmacyInfoFromNearbyList(pharmacyId)
+      if (pharmacyInfo) {
+        pharmacy.value = pharmacyInfo
+        console.log('✅ Infos de la pharmacie récupérées:', pharmacyInfo.nom)
+      }
+    } catch (err) {
+      console.error('Erreur lors de la récupération des infos de la pharmacie:', err)
+    }
+  }
+
+  // Charger les produits de cette pharmacie
+  if (pharmacyId) {
+    try {
+      await fetchPharmacyById(pharmacyId)
+    } catch (err) {
+      console.error('Erreur lors du chargement des produits:', err)
+    }
   }
 })
+
+// Fonction pour réessayer le chargement en cas d'erreur
+const retryLoading = async () => {
+  const pharmacyId = route.params.id
+  if (pharmacyId) {
+    try {
+      // Réessayer de charger les infos si on ne les a pas
+      if (!pharmacy.value) {
+        const pharmacyInfo = await fetchPharmacyInfoFromNearbyList(pharmacyId)
+        if (pharmacyInfo) {
+          pharmacy.value = pharmacyInfo
+        }
+      }
+      // Charger les produits
+      await fetchPharmacyById(pharmacyId)
+    } catch (err) {
+      console.error('Erreur lors du rechargement:', err)
+    }
+  }
+}
+
+// Définir la pharmacie dans le store quand elle change
+watch(pharmacy, (newPharmacy) => {
+  if (newPharmacy?.id && newPharmacy?.nom) {
+    cartStore.setPharmacy(newPharmacy.id, newPharmacy.nom)
+  }
+}, { immediate: true })
 
 const toggleProductSelection = (productId) => {
   const index = selectedProducts.value.indexOf(productId)
   if (index > -1) {
+    // Retirer du tableau de sélection temporaire
     selectedProducts.value.splice(index, 1)
   } else {
+    // Ajouter au tableau de sélection temporaire
     selectedProducts.value.push(productId)
-  }
-}
 
-const removeProduct = (productId) => {
-  const index = selectedProducts.value.indexOf(productId)
-  if (index > -1) {
-    selectedProducts.value.splice(index, 1)
+    // Ajouter au panier (store)
+    const product = products.value.find(p => p.id === productId)
+    if (product) {
+      cartStore.addItem(product, 1)
+    }
   }
 }
 
@@ -302,9 +397,8 @@ const clearSelection = () => {
   selectedProducts.value = []
 }
 
-const submitOrder = (orderData) => {
-  // Ici vous pourriez envoyer les données à une API
-  console.log('Commande soumise:', orderData)
+const handleOrderSubmitted = (orderData) => {
+  console.log('✅ Commande créée:', orderData)
 
   // Afficher le modal de succès
   showSuccessModal.value = true
