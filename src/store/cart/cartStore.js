@@ -11,6 +11,7 @@ export const useCartStore = defineStore('cart', () => {
   const pharmacyName = ref('') // Nom de la pharmacie
   const ordonnanceId = ref(null) // ID de l'ordonnance uploadée
   const ordonnanceData = ref(null) // Données base64 de l'ordonnance pour preview
+  const ordonnancePharmacyId = ref(null) // ID de la pharmacie pour laquelle l'ordonnance a été uploadée
   const customerInfo = ref({
     nom: '',
     prenom: '',
@@ -30,6 +31,7 @@ export const useCartStore = defineStore('cart', () => {
         pharmacyName: pharmacyName.value,
         ordonnanceId: ordonnanceId.value,
         ordonnanceData: ordonnanceData.value,
+        ordonnancePharmacyId: ordonnancePharmacyId.value,
         customerInfo: customerInfo.value
       }
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData))
@@ -52,6 +54,7 @@ export const useCartStore = defineStore('cart', () => {
         pharmacyName.value = cartData.pharmacyName || ''
         ordonnanceId.value = cartData.ordonnanceId || null
         ordonnanceData.value = cartData.ordonnanceData || null
+        ordonnancePharmacyId.value = cartData.ordonnancePharmacyId || null
         customerInfo.value = cartData.customerInfo || { nom: '', prenom: '', telWathsApp: '' }
         console.log('✅ Panier chargé depuis le localStorage:', items.value.length, 'article(s)')
         return true
@@ -64,7 +67,7 @@ export const useCartStore = defineStore('cart', () => {
 
   // Watcher pour sauvegarder automatiquement à chaque modification
   watch(
-    [items, pharmacyId, pharmacyName, ordonnanceId, ordonnanceData, customerInfo],
+    [items, pharmacyId, pharmacyName, ordonnanceId, ordonnanceData, ordonnancePharmacyId, customerInfo],
     () => {
       saveToStorage()
     },
@@ -166,6 +169,12 @@ export const useCartStore = defineStore('cart', () => {
    * @param {string} name - Nom de la pharmacie
    */
   const setPharmacy = (id, name) => {
+    // Si on change de pharmacie, vider l'ordonnance car elle n'est plus valide
+    if (pharmacyId.value && pharmacyId.value !== id && ordonnanceId.value) {
+      console.log('⚠️ Changement de pharmacie détecté - Suppression de l\'ordonnance')
+      clearOrdonnance()
+    }
+
     pharmacyId.value = id
     pharmacyName.value = name
     console.log('🏥 Pharmacie définie:', name)
@@ -175,11 +184,16 @@ export const useCartStore = defineStore('cart', () => {
    * Enregistre l'ID de l'ordonnance uploadée
    * @param {string} id - ID de l'ordonnance
    * @param {string} data - Données base64 de l'ordonnance
+   * @param {string} forPharmacyId - ID de la pharmacie pour laquelle l'ordonnance a été uploadée
    */
-  const setOrdonnance = (id, data) => {
+  const setOrdonnance = (id, data, forPharmacyId = null) => {
     ordonnanceId.value = id
     ordonnanceData.value = data
-    console.log('📄 Ordonnance enregistrée:', id)
+    ordonnancePharmacyId.value = forPharmacyId || pharmacyId.value
+    console.log('📄 Ordonnance enregistrée:', {
+      ordonnanceId: id,
+      pharmacieId: ordonnancePharmacyId.value
+    })
   }
 
   /**
@@ -188,6 +202,7 @@ export const useCartStore = defineStore('cart', () => {
   const clearOrdonnance = () => {
     ordonnanceId.value = null
     ordonnanceData.value = null
+    ordonnancePharmacyId.value = null
     console.log('📄 Ordonnance supprimée')
   }
 
@@ -209,6 +224,7 @@ export const useCartStore = defineStore('cart', () => {
     pharmacyName.value = ''
     ordonnanceId.value = null
     ordonnanceData.value = null
+    ordonnancePharmacyId.value = null
     customerInfo.value = {
       nom: '',
       prenom: '',
@@ -252,6 +268,7 @@ export const useCartStore = defineStore('cart', () => {
     pharmacyName,
     ordonnanceId,
     ordonnanceData,
+    ordonnancePharmacyId,
     customerInfo,
 
     // Computed

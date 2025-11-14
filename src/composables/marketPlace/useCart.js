@@ -97,13 +97,34 @@ export function useCart() {
         pendingOrdonnanceFile.value
       )
 
+      console.log('📥 Réponse complète du serveur (uploadOrdonnance):', response.data)
+
       if (response.data?.status === 'SUCCESS' && response.data.body) {
         const ordonnance = response.data.body
 
-        // Enregistrer dans le store
-        cartStore.setOrdonnance(ordonnance.id, ordonnance.data)
+        console.log('📦 Données ordonnance reçues:', {
+          structure: ordonnance,
+          hasId: !!ordonnance.id,
+          hasData: !!ordonnance.data,
+          id: ordonnance.id,
+          dataType: typeof ordonnance.data
+        })
 
-        console.log('✅ Ordonnance uploadée avec succès:', ordonnance.id)
+        // Vérifier que l'ID existe avant d'enregistrer
+        if (!ordonnance.id) {
+          console.error('❌ Pas d\'ID dans la réponse:', ordonnance)
+          throw new Error('L\'ID de l\'ordonnance est manquant dans la réponse du serveur')
+        }
+
+        // Enregistrer dans le store avec l'ID de la pharmacie
+        cartStore.setOrdonnance(ordonnance.id, ordonnance.data, pharmacyId)
+
+        console.log('✅ Ordonnance uploadée avec succès:', {
+          ordonnanceId: ordonnance.id,
+          pharmacieId: pharmacyId,
+          storeOrdonnanceId: cartStore.ordonnanceId,
+          storeOrdonnancePharmacyId: cartStore.ordonnancePharmacyId
+        })
 
         // Fermer le modal
         showPreviewModal.value = false
@@ -111,12 +132,22 @@ export function useCart() {
 
         return true
       } else {
+        console.error('❌ Réponse invalide:', {
+          status: response.data?.status,
+          hasBody: !!response.data?.body,
+          data: response.data
+        })
         throw new Error('Réponse invalide du serveur')
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'Erreur lors de l\'upload de l\'ordonnance'
       error.value = errorMessage
       console.error('❌ Erreur upload ordonnance:', err)
+      console.error('❌ Détails de l\'erreur:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      })
       return false
     } finally {
       uploadingOrdonnance.value = false
@@ -167,6 +198,23 @@ export function useCart() {
     try {
       console.log('📤 Étape 1/2 : Création du panier...')
 
+      // Vérifier l'état du store avant de récupérer les données
+      console.log('🔍 État du store avant getPanierData:', {
+        hasOrdonnance: cartStore.hasOrdonnance,
+        ordonnanceId: cartStore.ordonnanceId,
+        ordonnancePharmacyId: cartStore.ordonnancePharmacyId,
+        currentPharmacyId: cartStore.pharmacyId,
+        ordonnanceData: cartStore.ordonnanceData ? 'Présent' : 'Absent'
+      })
+
+      // Vérifier que l'ordonnance appartient à la bonne pharmacie
+      if (cartStore.hasOrdonnance && cartStore.ordonnancePharmacyId !== cartStore.pharmacyId) {
+        console.warn('⚠️ L\'ordonnance ne correspond pas à la pharmacie actuelle - Suppression de l\'ordonnance')
+        console.warn('   Ordonnance pour:', cartStore.ordonnancePharmacyId)
+        console.warn('   Commande pour:', cartStore.pharmacyId)
+        cartStore.clearOrdonnance()
+      }
+
       const panierData = cartStore.getPanierData()
       console.log('📦 Données du panier:', panierData)
 
@@ -197,14 +245,27 @@ export function useCart() {
         // Étape 3 : Soumettre à la pharmacie
         const submitResponse = await MarketPlaceService.submitPanierToPharmacy(submitData)
 
-        if (submitResponse.data?.status === 'SUCCESS') {
-          console.log('✅ Panier soumis à la pharmacie avec succès:', submitResponse.data.body)
+        console.log('📥 Réponse complète du serveur (submitPanierToPharmacy):', submitResponse)
+
+        // Le serveur peut retourner différents formats de réponse
+        // Format 1: { status: 'SUCCESS', body: {...} }
+        // Format 2: "Panier soumis à la pharmacie pour validation" (string direct)
+        // Format 3: Juste un status 200 OK
+
+        const isSuccess =
+          submitResponse.status === 200 ||
+          submitResponse.data?.status === 'SUCCESS' ||
+          (typeof submitResponse.data === 'string' && submitResponse.data.includes('soumis'))
+
+        if (isSuccess) {
+          console.log('✅ Panier soumis à la pharmacie avec succès:', submitResponse.data)
 
           // Vider le panier uniquement après les deux succès
           cartStore.clearCart()
 
           return panierCreated // Retourner les données du panier créé
         } else {
+          console.error('❌ Réponse inattendue:', submitResponse)
           throw new Error('Erreur lors de la soumission à la pharmacie')
         }
       } else {

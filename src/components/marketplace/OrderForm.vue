@@ -343,6 +343,28 @@ const handleFileSelect = async (event) => {
  * Confirme et upload l'ordonnance
  */
 const confirmOrdonnanceUpload = async () => {
+  // ✅ Vérifier si l'utilisateur est connecté
+  if (!authStore.isAuthenticated) {
+    console.log('🔒 Utilisateur non connecté - Redirection vers la page de connexion')
+
+    // Fermer le modal de preview
+    showPreviewModal.value = false
+
+    // Sauvegarder l'URL actuelle pour rediriger après connexion
+    const currentRoute = router.currentRoute.value
+
+    // Rediriger vers la page de connexion avec l'URL de retour
+    router.push({
+      path: '/signin',
+      query: {
+        redirect: currentRoute.fullPath
+      }
+    })
+
+    error.value = 'Veuillez vous connecter pour uploader une ordonnance'
+    return
+  }
+
   if (!props.pharmacyId) {
     error.value = 'ID de pharmacie manquant'
     return
@@ -431,6 +453,10 @@ const handleSubmit = async () => {
 
     // Émettre l'événement
     emit('order-submitted', result)
+
+    // Rediriger vers la page des ordonnances
+    console.log('✅ Commande soumise avec succès - Redirection vers /ordonnance')
+    router.push('/ordonnance')
   }
 }
 </script>
