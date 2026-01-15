@@ -33,6 +33,69 @@ export function useGroupes() {
     }
   }
 
+  const fetchMyGroupes = async () => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await GroupesServices.getMyGroup()
+
+      if (Array.isArray(response.data)) {
+        groupesList.value = response.data
+        return { success: true, data: groupesList.value }
+      }
+
+      if (response.data.body && Array.isArray(response.data.body)) {
+        groupesList.value = response.data.body
+        return { success: true, data: groupesList.value }
+      }
+
+      // Si c'est un objet groupe unique, on le met dans un tableau
+      if (response.data.body && typeof response.data.body === 'object') {
+        groupesList.value = [response.data.body]
+        return { success: true, data: groupesList.value }
+      }
+
+      if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+        groupesList.value = [response.data]
+        return { success: true, data: groupesList.value }
+      }
+
+      return { success: false, error: 'Erreur lors du chargement de vos groupes' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors du chargement de vos groupes'
+      console.error('❌ Erreur fetchMyGroupes:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const getGroupeById = async (groupeId) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await GroupesServices.getGroupeById(groupeId)
+
+      if (response.data.status === 'SUCCESS' && response.data.body) {
+        return { success: true, data: response.data.body }
+      }
+
+      if (response.data && typeof response.data === 'object') {
+        return { success: true, data: response.data }
+      }
+
+      return { success: false, error: 'Erreur lors du chargement du groupe' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors du chargement du groupe'
+      console.error('❌ Erreur getGroupeById:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const createGroupe = async (nom) => {
     isLoading.value = true
     error.value = null
@@ -153,15 +216,43 @@ export function useGroupes() {
     }
   }
 
+  const getGroupeReport = async (groupeId, month = null, year = null) => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await GroupesServices.getGroupeReport(groupeId, month, year)
+
+      if (response.data.status === 'SUCCESS' && response.data.body) {
+        return { success: true, data: response.data.body }
+      }
+
+      if (response.data && typeof response.data === 'object') {
+        return { success: true, data: response.data }
+      }
+
+      return { success: false, error: 'Erreur lors du chargement du rapport' }
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Erreur lors du chargement du rapport'
+      console.error('❌ Erreur getGroupeReport:', err)
+      return { success: false, error: error.value }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     isLoading,
     error,
     groupesList,
     fetchAllGroupes,
+    fetchMyGroupes,
+    getGroupeById,
     createGroupe,
     deleteGroupe,
     getSousGroupesByGroupe,
     createSousGroupe,
-    deleteSousGroupe
+    deleteSousGroupe,
+    getGroupeReport
   }
 }

@@ -44,7 +44,10 @@ Axios.interceptors.request.use((request) => {
   return request
 })
 
-// ✅ INTERCEPTEUR CORRIGÉ - Ne déconnecte plus automatiquement
+// Flag pour éviter les déconnexions multiples
+let isHandlingAuthError = false
+
+// Intercepteur de réponse - Gestion des erreurs d'authentification
 Axios.interceptors.response.use(
   (response) => {
     return response
@@ -52,28 +55,83 @@ Axios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    // ✅ Si erreur 401, juste notifier sans déconnecter
-    if (error.response?.status === 401) {
-      console.error('❌ Erreur 401 - Non autorisé:', {
+    // Gestion des erreurs 401 (Token invalide ou expiré)
+    if (error.response?.status === 401 && !isHandlingAuthError) {
+      console.error('❌ Erreur d\'authentification - Token invalide ou expiré:', {
+        status: error.response?.status,
+        url: originalRequest?.url,
+        method: originalRequest?.method,
+        message: error.response?.data?.message,
+      })
+
+      // Marquer qu'on est en train de gérer l'erreur
+      isHandlingAuthError = true
+
+      // Déconnexion automatique et redirection
+      await handleAuthenticationError()
+
+      // Réinitialiser le flag après un délai
+      setTimeout(() => {
+        isHandlingAuthError = false
+      }, 2000)
+    }
+
+    // Gestion des erreurs 403 (Accès refusé - permissions insuffisantes)
+    if (error.response?.status === 403) {
+      console.warn('⚠️ Accès refusé - Permissions insuffisantes:', {
         url: originalRequest?.url,
         method: originalRequest?.method,
       })
-
-      // ✅ Afficher une alerte au lieu de déconnecter
-      if (window.alert) {
-        alert(`⚠️ Erreur d'autorisation (401)\n\nVous n'avez pas les permissions nécessaires pour cette action.\n\nURL: ${originalRequest?.url}`)
-      }
-
-      // ✅ Option alternative : Utiliser un toast/notification si vous avez une lib
-      // Si vous utilisez une bibliothèque de notification (comme vue-toastification),
-      // décommentez et adaptez cette ligne :
-      // toast.error('Erreur d\'autorisation. Vérifiez vos permissions.', { duration: 5000 })
+      // On ne déconnecte pas l'utilisateur, juste un message d'erreur dans les composants
     }
 
-    // ✅ Rejeter l'erreur pour que le composant puisse la gérer
+    // Rejeter l'erreur pour que le composant puisse la gérer
     return Promise.reject(error)
   },
 )
+
+// Fonction pour gérer les erreurs d'authentification
+async function handleAuthenticationError() {
+  try {
+    // Dynamiquement importer le store auth et le toast pour éviter les dépendances circulaires
+    const { useAuthStore } = await import('@/store/auth/auth')
+    const { useToast } = await import('@/composables/useToast')
+
+    const authStore = useAuthStore()
+    const toast = useToast()
+
+    // Afficher un message d'erreur
+    toast.error('Votre session a expiré. Veuillez vous reconnecter.')
+
+    // Déconnecter l'utilisateur
+    await authStore.logout()
+
+    // Petit délai pour que l'utilisateur voie le toast
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    // Rediriger vers la page de connexion
+    if (router.currentRoute.value.path !== '/signin') {
+      router.push('/signin')
+    }
+
+    console.log('✅ Utilisateur déconnecté et redirigé vers la page de connexion')
+  } catch (error) {
+    console.error('❌ Erreur lors de la gestion de l\'erreur d\'authentification:', error)
+
+    // Fallback : nettoyage manuel et redirection
+    localStorage.removeItem('auth_data')
+    localStorage.removeItem('auth_token')
+    sessionStorage.removeItem('auth_data')
+    sessionStorage.removeItem('auth_token')
+
+    // Petit délai avant la redirection
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    if (router.currentRoute.value.path !== '/signin') {
+      router.push('/signin')
+    }
+  }
+}
 
 // Fonctions utilitaires
 const getToken = () => {

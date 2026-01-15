@@ -32,6 +32,12 @@ const assignRole = (userId, roleIds) => {
   )
 }
 
+const removeRole = (userId, roleId) => {
+  return callerService.Axios.delete(
+    `${callerService.API_URL}users/${userId}/remove-roles/${roleId}`
+  )
+}
+
 
 const assignEntity = (payload) => {
   return callerService.Axios.post(
@@ -48,13 +54,25 @@ const deleteUser = (id) => {
   return callerService.Axios.delete(`${callerService.API_URL}users/${id}`)
 }
 
+const updateSalaire = (id, salaire) => {
+  return callerService.Axios.patch(
+    `${callerService.API_URL}users/${id}/salaire`,
+    null,
+    {
+      params: { salaire }
+    }
+  )
+}
+
 export const UsersServices = {
   getUsers,
   assignRole,
+  removeRole,
   assignEntity,
   getUserById,
   getUsersByCityID,
   updateCoordonnees,
   updateUser,
   deleteUser,
+  updateSalaire,
 }

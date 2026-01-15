@@ -7,6 +7,7 @@ import {
   getUserInfo,
   logout as logoutApi,
 } from '@/api/services/authService'
+import { useToast } from '@/composables/useToast'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -87,6 +88,7 @@ export const useAuthStore = defineStore('auth', {
 
     // ✅ Étape 1: Connexion initiale
     async login(credentials) {
+      const toast = useToast()
       this.isLoading = true
       this.error = null
       this.successMessage = null
@@ -97,20 +99,27 @@ export const useAuthStore = defineStore('auth', {
 
         if (response.status === 'SUCCESS') {
           this.pendingUsername = credentials.username
+          const successMsg = response.message || 'Code envoyé avec succès'
+          this.successMessage = successMsg
+          toast.success(successMsg)
           return {
             success: true,
             requiresOtp: true,
-            message: response.message || 'Code envoyé avec succès',
+            message: successMsg,
           }
         }
 
+        const errorMsg = response.message || 'Erreur de connexion'
+        this.error = errorMsg
+        toast.error(errorMsg)
         return {
           success: false,
-          error: response.message || 'Erreur de connexion',
+          error: errorMsg,
         }
       } catch (error) {
         const errorMsg = error.response?.data?.message || 'Erreur de connexion au serveur'
         this.error = errorMsg
+        toast.error(errorMsg)
         console.error('Login error:', error)
         return { success: false, error: errorMsg }
       } finally {
@@ -120,9 +129,13 @@ export const useAuthStore = defineStore('auth', {
 
     // ✅ Étape 2: Vérification OTP
     async verifyOtp(otp) {
+      const toast = useToast()
+
       if (!this.pendingUsername) {
-        this.error = 'Session expirée. Veuillez vous reconnecter.'
-        return { success: false, error: this.error }
+        const errorMsg = 'Session expirée. Veuillez vous reconnecter.'
+        this.error = errorMsg
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
       }
 
       this.isLoading = true
@@ -143,16 +156,21 @@ export const useAuthStore = defineStore('auth', {
           this.pendingUsername = null
           this.saveToStorage()
           await this.fetchUserInfo()
+          toast.success('Connexion réussie ! Bienvenue.')
           return { success: true }
         }
 
+        const errorMsg = response.message || 'Code OTP invalide'
+        this.error = errorMsg
+        toast.error(errorMsg)
         return {
           success: false,
-          error: response.message || 'Code OTP invalide',
+          error: errorMsg,
         }
       } catch (error) {
         const errorMsg = error.response?.data?.message || 'Erreur de vérification OTP'
         this.error = errorMsg
+        toast.error(errorMsg)
         console.error('OTP verification error:', error)
         return { success: false, error: errorMsg }
       } finally {
@@ -162,9 +180,13 @@ export const useAuthStore = defineStore('auth', {
 
     // ✅ Renvoyer OTP
     async resendOtp() {
+      const toast = useToast()
+
       if (!this.pendingUsername) {
-        this.error = 'Session expirée. Veuillez vous reconnecter.'
-        return { success: false, error: this.error }
+        const errorMsg = 'Session expirée. Veuillez vous reconnecter.'
+        this.error = errorMsg
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
       }
 
       this.isLoading = true
@@ -175,17 +197,23 @@ export const useAuthStore = defineStore('auth', {
         const response = await resendOtp(this.pendingUsername)
 
         if (response.status === 'SUCCESS') {
-          this.successMessage = 'Code renvoyé avec succès'
-          return { success: true, message: this.successMessage }
+          const successMsg = 'Code renvoyé avec succès'
+          this.successMessage = successMsg
+          toast.success(successMsg)
+          return { success: true, message: successMsg }
         }
 
+        const errorMsg = response.message || 'Erreur lors du renvoi du code'
+        this.error = errorMsg
+        toast.error(errorMsg)
         return {
           success: false,
-          error: response.message || 'Erreur lors du renvoi du code',
+          error: errorMsg,
         }
       } catch (error) {
         const errorMsg = error.response?.data?.message || 'Erreur lors du renvoi du code'
         this.error = errorMsg
+        toast.error(errorMsg)
         console.error('Resend OTP error:', error)
         return { success: false, error: errorMsg }
       } finally {

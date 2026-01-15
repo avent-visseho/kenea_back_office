@@ -71,3 +71,33 @@ export const logout = async () => {
     throw error
   }
 }
+
+// ✅ Demande de réinitialisation de mot de passe
+export const resetPassword = async ({ to, username }) => {
+  try {
+    const response = await apiClient.post(`${API_BASE}/reset-password`, {
+      to,
+      username,
+    })
+    console.log('Reset password response:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Reset password error:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+// ✅ Mise à jour du mot de passe avec code
+export const updatePassword = async ({ code, password }) => {
+  try {
+    const response = await apiClient.post(`${API_BASE}/update-password`, {
+      code,
+      password,
+    })
+    console.log('Update password response:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Update password error:', error.response?.data || error.message)
+    throw error
+  }
+}

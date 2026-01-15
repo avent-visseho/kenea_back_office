@@ -157,6 +157,16 @@ const router = createRouter({
       },
     },
     {
+      path: '/mes-produits',
+      name: 'mes-produits',
+      component: () => import('../views/pharmacie/ProduitsPharmacieView.vue'),
+      meta: {
+        title: 'Mes Produits',
+        requiresAuth: true,
+        allowedRoles: ['PHARMACIE'],
+      },
+    },
+    {
       path: '/profile',
       name: 'Profile',
       component: () => import('../views/Others/UserProfile.vue'),
@@ -316,6 +326,24 @@ const router = createRouter({
       component: () => import('../views/Auth/Signup.vue'),
       meta: {
         title: 'Signup',
+        guest: true,
+      },
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('../views/Auth/RequestResetPassword.vue'),
+      meta: {
+        title: 'Réinitialiser mon mot de passe',
+        guest: true,
+      },
+    },
+    {
+      path: '/confirm-reset-password',
+      name: 'confirm-reset-password',
+      component: () => import('../views/Auth/ConfirmResetPassword.vue'),
+      meta: {
+        title: 'Confirmer la réinitialisation',
         guest: true,
       },
     },

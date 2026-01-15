@@ -203,6 +203,11 @@ const menuGroups = [
         name: 'Traitement',
         path: '/ordonnance-progression',
         allowedRoles: ['PHARMACIE', 'ADMIN', 'SUPER_ADMIN'],
+      },{
+        icon: CalenderIcon,
+        name: 'mes-produits',
+        path: 'mes-produits',
+        allowedRoles: ['PHARMACIE'],
       },
       {
         icon: CalenderIcon,

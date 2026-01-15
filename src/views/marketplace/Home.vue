@@ -1,11 +1,146 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- Header/Navigation -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+    <!-- Landing Page Hero avec bannière -->
+    <section
+      v-if="showLandingPage"
+      class="relative min-h-screen flex items-center justify-center bg-cover bg-center"
+      style="background-image: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')"
+    >
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-black/60"></div>
+
+      <!-- Contenu -->
+      <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8">
+        <!-- Logo -->
+        <div class="mb-8">
+          <h1 class="text-5xl md:text-7xl font-bold text-white mb-4">
+            Kenea
+          </h1>
+          <p class="text-xl md:text-2xl text-white/90">
+            Votre santé, notre priorité
+          </p>
+        </div>
+
+        <!-- Texte principal -->
+        <div class="max-w-3xl mx-auto mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+            Trouvez vos médicaments facilement
+          </h2>
+          <p class="text-lg md:text-xl text-white/80">
+            Commandez vos médicaments en ligne ou recherchez des produits spécifiques dans nos pharmacies partenaires
+          </p>
+        </div>
+
+        <!-- Boutons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <!-- Achat direct -->
+          <div class="relative group">
+            <button
+              @click="showMarketplace"
+              class="relative px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white font-semibold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl min-w-[250px]"
+            >
+              <span class="flex items-center justify-center gap-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Achat Direct
+              </span>
+            </button>
+
+            <!-- Tooltip Achat Direct -->
+            <div class="tooltip-elegant">
+              <div class="tooltip-content">
+                <div class="flex items-start gap-3 mb-3">
+                  <!-- <div class="flex-shrink-0 w-10 h-10 bg-brand-500/10 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div> -->
+                  <div>
+                    <h4 class="font-semibold text-gray-900 mb-1">Parcourir & Commander</h4>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                      Explorez notre marketplace, sélectionnez les produits que vous souhaitez avec leurs prix affichés, et envoyez votre commande à la pharmacie de votre choix.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-brand-600">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Pas de connexion requise</span>
+                </div>
+              </div>
+              <div class="tooltip-arrow"></div>
+            </div>
+          </div>
+
+          <!-- Recherche -->
+          <div class="relative group">
+            <button
+              @click="goToSearch"
+              class="relative px-8 py-4 bg-white hover:bg-gray-50 text-brand-500 font-semibold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl min-w-[250px]"
+            >
+              <span class="flex items-center justify-center gap-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Recherche
+              </span>
+            </button>
+
+            <!-- Tooltip Recherche -->
+            <div class="tooltip-elegant">
+              <div class="tooltip-content">
+                <div class="flex items-start gap-3 mb-3">
+                 <!--  <div class="flex-shrink-0 w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div> -->
+                  <div>
+                    <h4 class="font-semibold text-gray-900 mb-1">Upload d'Ordonnance</h4>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                      Connectez-vous pour uploader votre ordonnance médicale et l'envoyer à une ou plusieurs pharmacies. Recevez les réponses directement avec les prix et disponibilités.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-purple-600">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Connexion requise</span>
+                </div>
+              </div>
+              <div class="tooltip-arrow"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info supplémentaire -->
+        <div class="mt-12">
+          <p class="text-white/70 text-sm">
+            Service disponible 24h/24 - Plus de 1000 produits disponibles
+          </p>
+        </div>
+      </div>
+
+      <!-- Bouton scroll vers le bas -->
+      <button
+        @click="showMarketplace"
+        class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-white/80 hover:text-white transition-colors"
+      >
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </button>
+    </section>
+
+    <!-- Header/Navigation (affiché après le clic sur "Achat direct") -->
+    <header v-if="!showLandingPage" class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <!-- Logo -->
-          <div class="flex items-center">
+          <div class="flex items-center cursor-pointer" @click="backToLanding">
             <h1 class="text-2xl font-bold text-brand-500">
               Kenea
             </h1>
@@ -13,42 +148,27 @@
 
           <!-- Navigation -->
           <nav class="hidden md:flex items-center gap-6">
-            <router-link to=""
-              class="text-gray-700 dark:text-gray-300 hover:text-brand-500 font-medium">Accueil</router-link>
-            <router-link to=""
-              class="text-gray-700 dark:text-gray-300 hover:text-brand-500 font-medium">Pharmacies</router-link>
-            <router-link to="" class="text-gray-700 dark:text-gray-300 hover:text-brand-500 font-medium"> À
-              propos</router-link>
+            <a @click="backToLanding" class="text-gray-700 dark:text-gray-300 hover:text-brand-500 font-medium cursor-pointer">Accueil</a>
+            <a href="#pharmacies" class="text-gray-700 dark:text-gray-300 hover:text-brand-500 font-medium">Pharmacies</a>
           </nav>
 
           <!-- Bouton connexion -->
           <div class="flex items-center gap-4">
             <router-link to="/signin"
-              class="px-4 py-2 text-brand-500 hover:text-brand-600 font-medium transition-colors"> Se
-              connecter</router-link>
+              class="px-4 py-2 text-brand-500 hover:text-brand-600 font-medium transition-colors">
+              Se connecter
+            </router-link>
             <router-link to="/signin"
               class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors">
-              Espace Pro</router-link>
-
-            <!--             <button
-              @click="goToLogin"
-              class="px-4 py-2 text-brand-500 hover:text-brand-600 font-medium transition-colors"
-            >
-              Se connecter
-            </button> -->
-            <!--  <button
-              @click="goToLogin"
-              class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors"
-            >
               Espace Pro
-            </button> -->
+            </router-link>
           </div>
         </div>
       </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-brand-500 to-brand-600 text-white py-16">
+    <section v-if="!showLandingPage" class="bg-gradient-to-r from-brand-500 to-brand-600 text-white py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
           <h2 class="text-4xl md:text-5xl font-bold mb-4">
@@ -77,7 +197,7 @@
     </section>
 
     <!-- Statistiques -->
-    <section class="py-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <section v-if="!showLandingPage" class="py-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700" id="pharmacies">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div class="text-center">
@@ -101,7 +221,7 @@
     </section>
 
     <!-- Liste des pharmacies -->
-    <section class="py-12">
+    <section v-if="!showLandingPage" class="py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Titre et filtres -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -201,7 +321,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 dark:bg-gray-900 text-white py-12 mt-12">
+    <footer v-if="!showLandingPage" class="bg-gray-800 dark:bg-gray-900 text-white py-12 mt-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -253,6 +373,7 @@ import { useMarketPlace } from '@/composables/marketPlace/useMarketPlace'
 
 const router = useRouter()
 const searchQuery = ref('')
+const showLandingPage = ref(true)
 
 // Utilisation du composable marketplace
 const {
@@ -301,4 +422,121 @@ const goToPharmacy = (pharmacy) => {
 const goToLogin = () => {
   router.push({ name: 'signin' })
 }
+
+// Afficher le marketplace (masquer le landing)
+const showMarketplace = () => {
+  showLandingPage.value = false
+}
+
+// Rediriger vers la recherche (page de connexion)
+const goToSearch = () => {
+  router.push('/signin')
+}
+
+// Retour au landing
+const backToLanding = () => {
+  showLandingPage.value = true
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 </script>
+
+<style scoped>
+/* Tooltip élégant */
+.tooltip-elegant {
+  position: absolute;
+  bottom: calc(100% + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.group:hover .tooltip-elegant {
+  opacity: 1;
+  visibility: visible;
+  bottom: calc(100% + 15px);
+}
+
+.tooltip-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15),
+              0 10px 30px rgba(0, 0, 0, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  min-width: 320px;
+  max-width: 380px;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Animation au survol */
+@keyframes tooltipPulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.02);
+  }
+}
+
+.group:hover .tooltip-elegant {
+  animation: tooltipPulse 2s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .tooltip-content {
+    min-width: 280px;
+    max-width: 320px;
+    padding: 16px;
+  }
+
+  .tooltip-elegant {
+    left: 50%;
+    right: auto;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tooltip-content {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .tooltip-content h4 {
+    color: #f9fafb;
+  }
+
+  .tooltip-content p {
+    color: #d1d5db;
+  }
+
+  .tooltip-arrow {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+</style>

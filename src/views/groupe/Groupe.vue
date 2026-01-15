@@ -76,12 +76,12 @@ import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import GroupesList from '@/components/groupe/GroupesList.vue'
 import { useGroupes } from '@/composables/groupe/useGroupes'
 
-const currentPageTitle = ref('Gestion des groupes d’affiliation')
-const { groupesList, fetchAllGroupes } = useGroupes()
+const currentPageTitle = ref('Mes groupes d\'affiliation')
+const { groupesList, fetchMyGroupes } = useGroupes()
 
 const totalGroupes = computed(() => groupesList.value.length)
 
 onMounted(async () => {
-  await fetchAllGroupes()
+  await fetchMyGroupes()
 })
 </script>
